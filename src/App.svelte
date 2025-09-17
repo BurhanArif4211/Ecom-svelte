@@ -1,123 +1,83 @@
+<!-- src/App.svelte -->
 <script>
-    import { onMount } from 'svelte';
-    import Carousel from './components/Carousel.svelte';
-    import ProductCard from './components/ProductCard.svelte';
+// @ts-nocheck
 
-    // State management
-    let featuredProducts = [];
-    let productCategories = [];
-    let products = [];
-    let isLoading = true;
-    let error = null;
-
-    // Fetch data from WordPress REST API
-    const fetchData = async () => {
-        try {
-            // Fetch featured products (adjust per_page as needed)
-            const featuredRes = await fetch('/wp/wp-json/wc/v3/products?featured=true&per_page=5');
-            featuredProducts = await featuredRes.json();
-            
-            // Fetch product categories
-            const categoriesRes = await fetch('/wp/wp-json/wc/v3/products/categories?per_page=10');
-            productCategories = await categoriesRes.json();
-
-            // Fetch recent products
-            const productsRes = await fetch('/wp/wp-json/wc/v3/products?per_page=8');
-            products = await productsRes.json();
-
-        } catch (err) {
-            error = err.message;
-        } finally {
-            isLoading = false;
-        }
-    };
-
-    onMount(fetchData);
+    import { onMount } from "svelte";
+    import { router } from "./router.js";
+    import HomePage from "./pages/HomePage.svelte";
+    import ProductPage from "./pages/ProductPage.svelte";
+    import CartPage from "./pages/CartPage.svelte";
+    import CheckoutPage from "./pages/CheckoutPage.svelte";
+    import NotFound from "./pages/NotFound.svelte";
+    import CartModal from "./components/CartModal.svelte";
+    import { cart, initSession } from "./lib/stores";
+    
+    // subscribe to { page, params }
+    let page, params;
+    let showCartModal = false;
+    
+    router.subscribe((r) => {
+        page = r.page;
+        params = r.params;
+    });
+    
+    // Initialize session on app load
+    onMount(async () => {
+        await initSession();
+    });
 </script>
 
-<!-- Main Layout -->
-<main class="min-h-screen bg-gray-50">
-    {#if isLoading}
-        <div class="flex justify-center items-center h-screen">
-            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-    {:else if error}
-        <div class="text-red-500 text-center p-8">Error: {error}</div>
-    {:else}
-        <!-- Featured Products Carousel -->
-        <section class="mb-16">
-            <Carousel items={featuredProducts} let:item>
-                <div class="relative h-[500px] md:h-[600px]">
-                    <img 
-                        src={item.images[0]?.src || 'https://via.placeholder.com/1200x600'} 
-                        alt={item.name}
-                        class="w-full h-full object-cover"
-                    />
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center">
-                        <div class="container mx-auto px-4 text-white max-w-2xl">
-                            <h2 class="text-3xl md:text-5xl font-bold mb-4">{item.name}</h2>
-                            <p class="text-xl mb-6 line-clamp-2">{item.short_description.replace(/<[^>]*>/g, '')}</p>
-                            <a 
-                                href={`/products/${item.id}`} 
-                                class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
-                            >
-                                Shop Now
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </Carousel>
-        </section>
-
-        <!-- Categories Carousel -->
-        <section class="container mx-auto px-4 mb-16">
-            <h2 class="text-3xl font-bold text-center mb-10">Shop Categories</h2>
-            <div class="relative">
-                <Carousel 
-                    items={productCategories} 
-                    itemsPerView={{ mobile: 2, tablet: 4, desktop: 6 }}
-                    let:item
-                    showControls
-                >
-                    <a 
-                        href={`/category/${item.id}`} 
-                        class="block group text-center p-4"
-                    >
-                        <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-3" />
-                        <h3 class="text-lg font-semibold group-hover:text-blue-600 transition-colors">
-                            {item.name}
-                        </h3>
-                        <p class="text-gray-500 text-sm">({item.count} items)</p>
-                    </a>
-                </Carousel>
+<main class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" on:click={() => router.navigate('/')}>ShopSvelte</h1>
             </div>
-        </section>
-
-        <!-- Product Grid -->
-        <section class="container mx-auto px-4 mb-16">
-            <div class="flex justify-between items-center mb-10">
-                <h2 class="text-3xl font-bold">Featured Products</h2>
-                <a href="/products" class="text-blue-600 hover:underline">View All Products</a>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {#each products as product}
-                    <ProductCard {product} />
-                {/each}
-            </div>
-        </section>
-
-        <!-- Promotional Banner -->
-        <section class="bg-blue-800 text-white py-16 mb-16">
-            <div class="container mx-auto px-4 text-center">
-                <h2 class="text-4xl font-bold mb-4">Summer Sale</h2>
-                <p class="text-xl mb-8 max-w-2xl mx-auto">
-                    Up to 50% off on seasonal items. Limited time offer!
-                </p>
-                <button class="bg-white text-blue-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-300">
-                    Shop the Sale
+            <nav class="hidden md:block">
+                <ul class="flex space-x-6">
+                    <li><a href="/" class="font-medium hover:text-blue-600">Home</a></li>
+                    <li><a href="/products" class="font-medium hover:text-blue-600">Products</a></li>
+                    <li><a href="/categories" class="font-medium hover:text-blue-600">Categories</a></li>
+                </ul>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <button class="relative p-2" on:click={() => showCartModal = true}>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    {#if $cart?.item_count > 0}
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            {$cart.item_count}
+                        </span>
+                    {/if}
                 </button>
             </div>
-        </section>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex-grow">
+        {#if page === "home"}
+            <HomePage />
+        {:else if page === "productPage"}
+            <ProductPage productId={params.id} />
+        {:else if page === "cartPage"}
+            <CartPage />
+        {:else if page === "checkoutPage"}
+            <CheckoutPage />
+        {:else}
+            <NotFound />
+        {/if}
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <!-- Footer content same as before -->
+    </footer>
+
+    <!-- Cart Modal -->
+    {#if showCartModal}
+        <CartModal onClose={() => showCartModal = false} />
     {/if}
 </main>
