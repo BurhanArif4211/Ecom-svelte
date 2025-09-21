@@ -1,9 +1,11 @@
 <!-- src/pages/CheckoutPage.svelte -->
 <script>
+// @ts-nocheck
+
     import { onMount } from 'svelte';
     import { cart, fetchCart, updateCustomer, selectShippingRate, placeOrder } from '../lib/stores';
     import { router } from '../router';
-    
+    import { validateAddress, validateEmail } from '../lib/utils';
     // Form state
     let billing = {
         first_name: '',
@@ -40,20 +42,14 @@
     let error = null;
     let orderPlaced = false;
     let orderData = null;
-    
+    let billingErrors = {};
+    let shippingErrors = {};
     // Initialize checkout
     onMount(async () => {
         try {
             await fetchCart();
             isLoading = false;
             
-            // If customer info exists, pre-fill form
-            if ($cart.billing_address) {
-                billing = {...$cart.billing_address};
-            }
-            if ($cart.shipping_address) {
-                shipping = {...$cart.shipping_address};
-            }
         } catch (err) {
             error = err.message || "Failed to load checkout data";
             isLoading = false;
@@ -68,19 +64,38 @@
         }
     };
     
-   // Update customer information - corrected to match API spec
-   const updateCustomerInfo = async () => {
+    
+// Update customer information with validation
+const updateCustomerInfo = async () => {
         try {
             isLoading = true;
             
+            // Validate billing address
+            const billingValidation = validateAddress(billing);
+            if (!billingValidation.isValid) {
+                billingErrors = billingValidation.errors;
+                throw new Error("Please fix billing address errors");
+            }
+            
+            // Validate email separately
+            if (!billing.email || !validateEmail(billing.email)) {
+                billingErrors.email = "Valid email is required";
+                throw new Error("Valid email is required");
+            }
+            
+            // Validate shipping address if different
+            if (!useSameAddress) {
+                const shippingValidation = validateAddress(shipping);
+                if (!shippingValidation.isValid) {
+                    shippingErrors = shippingValidation.errors;
+                    throw new Error("Please fix shipping address errors");
+                }
+            }
             // Prepare data according to API spec
             const customerData = {
                 billing_address: billing
             };
             
-            if (!useSameAddress) {
-                customerData.shipping_address = shipping;
-            }
             
             await updateCustomer(customerData);
             await fetchCart(); // Refresh cart with updated info
@@ -96,12 +111,19 @@
     const placeOrderHandler = async () => {
         try {
             isLoading = true;
-            
-            // First update customer info to ensure addresses are current
+            // First validate and update customer info
             await updateCustomerInfo();
             
+            // Additional validation for order placement
+            if (!selectedShipping && $cart.needs_shipping) {
+                throw new Error("Please select a shipping method");
+            }
+            
+            if (!selectedPayment) {
+                throw new Error("Please select a payment method");
+            }
             // Prepare order data according to API spec
-            const orderData = {
+            let orderData = {
                 payment_method: selectedPayment,
                 customer_note: orderNotes,
                 billing_address: billing

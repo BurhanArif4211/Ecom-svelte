@@ -15,15 +15,15 @@
     const fetchData = async () => {
         try {
             // Fetch featured products (adjust per_page as needed)
-            const featuredRes = await fetch('/wp/wp-json/wc/v3/products?featured=true&per_page=5');
+            const featuredRes = await fetch('/wp/wp-json/wc/store/products?featured=true&per_page=5');
             featuredProducts = await featuredRes.json();
             
             // Fetch product categories
-            const categoriesRes = await fetch('/wp/wp-json/wc/v3/products/categories?per_page=10');
+            const categoriesRes = await fetch('/wp/wp-json/wc/store/products/categories?per_page=10');
             productCategories = await categoriesRes.json();
 
             // Fetch recent products
-            const productsRes = await fetch('/wp/wp-json/wc/v3/products?per_page=8');
+            const productsRes = await fetch('/wp/wp-json/wc/store/products?per_page=8');
             products = await productsRes.json();
 
         } catch (err) {

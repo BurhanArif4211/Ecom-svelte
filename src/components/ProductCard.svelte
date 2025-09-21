@@ -1,5 +1,9 @@
 <!-- /components/ProductCard.svelte -->
 <script>
+// @ts-nocheck
+
+    import { addToCart } from "../lib/stores";
+
     export let product;
 </script>
 
@@ -30,7 +34,7 @@
                 {/if}
             </div>
             
-            <button class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors">
+            <button onclick={addToCart(product.id)} class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors">
                 Add to Cart
             </button>
         </div>

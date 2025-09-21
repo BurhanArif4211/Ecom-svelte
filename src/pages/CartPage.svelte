@@ -1,8 +1,10 @@
 <!-- src/pages/CartPage.svelte -->
 <script>
+// @ts-nocheck
+
     import { cart, updateCartItem, removeCartItem } from '../lib/stores';
     import { onMount } from 'svelte';
-    import { router } from '../router/router';
+    import { router } from '../router';
     
     let isLoading = false;
     let error = null;
@@ -40,7 +42,7 @@
         <div class="flex justify-center items-center h-64">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-    {:else if $cart.item_count === 0}
+    {:else if $cart.items_count === 0}
         <div class="text-center py-16">
             <h2 class="text-2xl font-semibold mb-4">Your cart is empty</h2>
             <button 

@@ -1,1 +1,4 @@
 @import "tailwindcss";
+:root{
+    transition: all ease 0.2s;
+}
