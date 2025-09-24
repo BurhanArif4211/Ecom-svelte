@@ -21,11 +21,11 @@
     {/if}
     
     <div class="p-4 flex-grow flex flex-col">
-        <h3 class="font-semibold text-lg mb-2">{product.name}</h3>
+        <h3 class="font-semibold text-lg mb-2">{product.name.split(" ").slice(0,10).join(' ')}</h3>
         <div class="mt-auto">
             <div class="flex justify-between items-center">
                 <span class="text-xl font-bold text-gray-900">
-                    ${product.price}
+                    {product.prices.currency_prefix} {product.prices.price}
                 </span>
                 {#if product.on_sale}
                     <span class="bg-red-100 text-red-800 text-sm px-2 py-1 rounded">

@@ -45,16 +45,16 @@
         <!-- Featured Products Carousel -->
         <section class="mb-16">
             <Carousel items={featuredProducts} let:item>
-                <div class="relative h-[500px] md:h-[600px]">
+                <div class="relative h-[200px] md:h-[300px]">
                     <img 
                         src={item.images[0]?.src || 'https://via.placeholder.com/1200x600'} 
                         alt={item.name}
                         class="w-full h-full object-cover"
                     />
                     <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center">
-                        <div class="container mx-auto px-4 text-white max-w-2xl">
-                            <h2 class="text-3xl md:text-5xl font-bold mb-4">{item.name}</h2>
-                            <p class="text-xl mb-6 line-clamp-2">{item.short_description.replace(/<[^>]*>/g, '')}</p>
+                        <div class="container mx-auto px-4 text-white max-w-4xl">
+                            <h2 class="text-2xl md:text-3xl font-bold mb-4">{item.name.split(" ").slice(0,5).join(' ')}</h2>
+                            
                             <a 
                                 href={`/products/${item.id}`} 
                                 class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
@@ -81,7 +81,7 @@
                         href={`/category/${item.id}`} 
                         class="block group text-center p-4"
                     >
-                        <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-3" />
+                        <img src={`${(item.image !=null) ? item?.image?.src:''}`} class="border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-3" />
                         <h3 class="text-lg font-semibold group-hover:text-blue-600 transition-colors">
                             {item.name}
                         </h3>
