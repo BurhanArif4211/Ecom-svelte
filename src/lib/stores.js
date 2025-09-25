@@ -187,10 +187,7 @@ export const fetchProducts = async (params = {}) => {
 // Fetch product categories
 export const fetchCategories = async (params = {}) => {
     try {
-        const url = new URL(`${PUBLIC_API_BASE}/products/categories`);
-        Object.entries(params).forEach(([key, value]) => {
-            url.searchParams.append(key, value);
-        });
+        const url = `/wp/wp-json/wc/store/products/categories`;
         
         const response = await fetch(url, {
             credentials: 'include',

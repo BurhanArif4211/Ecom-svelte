@@ -8,7 +8,7 @@ export default defineConfig({
       '/wp/wp-json/': {
         target: 'https://autogearlift.com',
         changeOrigin: true,
-        secure: true, // If you're using https, set this to true
+        secure: false, // If you're using https, set this to true
       },
     }
   },

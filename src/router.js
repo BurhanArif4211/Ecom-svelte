@@ -18,7 +18,7 @@ export const routes = {
         const search = queryParams.get('search') || '';
         const category = queryParams.get('category') || '';
         
-        let url = `/wp-json/wc/store/products?per_page=12`;
+        let url = `/wp/wp-json/wc/store/products?per_page=12`;
         
         if (search) url += `&search=${encodeURIComponent(search)}`;
         if (category) url += `&category=${encodeURIComponent(category)}`;
@@ -51,7 +51,7 @@ export const routes = {
     name: 'Product',
     data: async (params) => {
       try {
-        const response = await fetch(`/wp-json/wc/store/products/${params.id}`);
+        const response = await fetch(`/wp/wp-json/wc/store/products/${params.id}`);
         
         if (!response.ok) {
           if (response.status === 404) {
@@ -80,7 +80,7 @@ export const routes = {
       try {
         // First, get category ID from slug
         const categoriesResponse = await fetch(
-          `/wp-json/wc/store/products/categories?slug=${params.slug}`
+          `/wp/wp-json/wc/store/products/categories?slug=${params.slug}`
         );
         
         if (!categoriesResponse.ok) {
@@ -97,7 +97,7 @@ export const routes = {
         
         // Then fetch products in this category
         const productsResponse = await fetch(
-          `/wp-json/wc/store/products?category=${category.id}&per_page=12`
+          `/wp/wp-json/wc/store/products?category=${category.id}&per_page=12`
         );
         
         if (!productsResponse.ok) {
@@ -135,7 +135,7 @@ export const routes = {
         }
         
         const response = await fetch(
-          `/wp-json/wc/store/products?search=${encodeURIComponent(query)}&per_page=12`
+          `/wp/wp-json/wc/store/products?search=${encodeURIComponent(query)}&per_page=12`
         );
         
         if (!response.ok) {
