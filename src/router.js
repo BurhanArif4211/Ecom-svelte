@@ -8,32 +8,6 @@ export const routes = {
     component: () => import('./pages/HomePage.svelte'),
     name: 'Home'
   },
-  '/products': {
-    component: () => import('./pages/ProductsPage.svelte'),
-    name: 'Products',
-    data: async (params) => {
-      try {
-        // Fetch all products with optional query parameters
-        const queryParams = new URLSearchParams(window.location.search);
-        const search = queryParams.get('search') || '';
-        const category = queryParams.get('category') || '';
-        
-        let url = `/wp/wp-json/wc/store/products?per_page=12`;
-        
-        if (search) url += `&search=${encodeURIComponent(search)}`;
-        if (category) url += `&category=${encodeURIComponent(category)}`;
-        
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
-        const products = await response.json();
-        return { products, search, category };
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-      }
-    }
-  },
   
   '/cart': {
     component: () => import('./pages/CartPage.svelte'),
@@ -44,7 +18,78 @@ export const routes = {
     component: () => import('./pages/CheckoutPage.svelte'),
     name: 'Checkout'
   },
-  
+  '/products': {
+    component: () => import('./pages/ProductsPage.svelte'),
+    name: 'Products',
+    data: async (params) => {
+        try {
+            const queryParams = new URLSearchParams(window.location.search);
+            
+            // Extract all possible filter parameters
+            const search = queryParams.get('search') || '';
+            const category = queryParams.get('category') || '';
+            const min_price = queryParams.get('min_price') || '';
+            const max_price = queryParams.get('max_price') || '';
+            const on_sale = queryParams.get('on_sale') || '';
+            const in_stock = queryParams.get('in_stock') || '';
+            const orderby = queryParams.get('orderby') || 'date';
+            const order = queryParams.get('order') || 'desc';
+            const page = parseInt(queryParams.get('page')) || 1;
+            const per_page = 12; // Fixed per page for consistency
+            
+            // Build API URL with all parameters
+            let url = `/wp/wp-json/wc/store/products?per_page=${per_page}&page=${page}`;
+            
+            // Add filters
+            if (search) url += `&search=${encodeURIComponent(search)}`;
+            if (category) url += `&category=${encodeURIComponent(category)}`;
+            if (min_price) url += `&min_price=${parseInt(min_price) * 100}`; // Convert to cents
+            if (max_price) url += `&max_price=${parseInt(max_price) * 100}`; // Convert to cents
+            if (on_sale === 'true') url += '&on_sale=true';
+            if (in_stock === 'true') url += '&stock_status=instock';
+            
+            // Add sorting
+            url += `&orderby=${orderby}&order=${order}`;
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
+            // Extract pagination info from headers
+            const totalItems = parseInt(response.headers.get('x-wp-total')) || 0;
+            const totalPages = parseInt(response.headers.get('x-wp-totalpages')) || 1;
+            
+            const products = await response.json();
+            
+            // Fetch categories for filter sidebar
+            const categoriesResponse = await fetch('/wp/wp-json/wc/store/products/categories?per_page=100&hide_empty=true');
+            const categories = categoriesResponse.ok ? await categoriesResponse.json() : [];
+            
+            return {
+                products,
+                categories,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalItems,
+                    perPage: per_page
+                },
+                filters: {
+                    search,
+                    category,
+                    min_price,
+                    max_price,
+                    on_sale: on_sale === 'true',
+                    in_stock: in_stock === 'true',
+                    orderby,
+                    order
+                }
+            };
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            throw error;
+        }
+    }
+  },
   // Product detail routes
   '/product/:id': {
     component: () => import('./pages/ProductPage.svelte'),
@@ -77,79 +122,74 @@ export const routes = {
     component: () => import('./pages/ProductsPage.svelte'),
     name: 'Category',
     data: async (params) => {
-      try {
-        // First, get category ID from slug
-        const categoriesResponse = await fetch(
-          `/wp/wp-json/wc/store/products/categories?slug=${params.slug}`
-        );
-        
-        if (!categoriesResponse.ok) {
-          throw new Error(`HTTP error! status: ${categoriesResponse.status}`);
+        try {
+            const queryParams = new URLSearchParams(window.location.search);
+            const page = parseInt(queryParams.get('page')) || 1;
+            const per_page = 12;
+            
+            // First, get category ID from slug
+            const categoriesResponse = await fetch(
+                `/wp/wp-json/wc/store/products/categories?slug=${params.slug}`
+            );
+            
+            if (!categoriesResponse.ok) {
+                throw new Error(`HTTP error! status: ${categoriesResponse.status}`);
+            }
+            
+            const categories = await categoriesResponse.json();
+            
+            if (categories.length === 0) {
+                throw new Error('CATEGORY_NOT_FOUND');
+            }
+            
+            const category = categories[0];
+            
+            // Build products URL with category filter
+            let url = `/wp/wp-json/wc/store/products?category=${category.id}&per_page=${per_page}&page=${page}`;
+            
+            // Add sorting if specified
+            const orderby = queryParams.get('orderby') || 'date';
+            const order = queryParams.get('order') || 'desc';
+            url += `&orderby=${orderby}&order=${order}`;
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
+            // Extract pagination info
+            const totalItems = parseInt(response.headers.get('x-wp-total')) || 0;
+            const totalPages = parseInt(response.headers.get('x-wp-totalpages')) || 1;
+            
+            const products = await response.json();
+            
+            // Fetch all categories for sidebar
+            const allCategoriesResponse = await fetch('/wp/wp-json/wc/store/products/categories?per_page=100&hide_empty=true');
+            const allCategories = allCategoriesResponse.ok ? await allCategoriesResponse.json() : [];
+            
+            return {
+                products,
+                categories: allCategories,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalItems,
+                    perPage: per_page
+                },
+                filters: {
+                    category: category.id,
+                    orderby,
+                    order
+                },
+                currentCategory: category
+            };
+        } catch (error) {
+            if (error.message === 'CATEGORY_NOT_FOUND') {
+                throw new Error('CATEGORY_NOT_FOUND');
+            }
+            console.error('Error fetching category products:', error);
+            throw error;
         }
-        
-        const categories = await categoriesResponse.json();
-        
-        if (categories.length === 0) {
-          throw new Error('CATEGORY_NOT_FOUND');
-        }
-        
-        const category = categories[0];
-        
-        // Then fetch products in this category
-        const productsResponse = await fetch(
-          `/wp/wp-json/wc/store/products?category=${category.id}&per_page=12`
-        );
-        
-        if (!productsResponse.ok) {
-          throw new Error(`HTTP error! status: ${productsResponse.status}`);
-        }
-        
-        const products = await productsResponse.json();
-        
-        return {
-          products,
-          category: category,
-          isCategoryView: true
-        };
-      } catch (error) {
-        if (error.message === 'CATEGORY_NOT_FOUND') {
-          throw new Error('CATEGORY_NOT_FOUND');
-        }
-        console.error('Error fetching category products:', error);
-        throw error;
-      }
     }
-  },
-  
-  // Search results route
-  '/search': {
-    component: () => import('./pages/ProductsPage.svelte'),
-    name: 'Search',
-    data: async (params) => {
-      try {
-        const queryParams = new URLSearchParams(window.location.search);
-        const query = queryParams.get('q') || '';
-        
-        if (!query) {
-          return { products: [], searchQuery: '', isSearchView: true };
-        }
-        
-        const response = await fetch(
-          `/wp/wp-json/wc/store/products?search=${encodeURIComponent(query)}&per_page=12`
-        );
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const products = await response.json();
-        return { products, searchQuery: query, isSearchView: true };
-      } catch (error) {
-        console.error('Error fetching search results:', error);
-        throw error;
-      }
-    }
-  },
+    },
   
   // Fallback route
   '/404': {

@@ -52,7 +52,7 @@
 <div class="min-h-screen bg-gray-50 py-8">
     <div class="container mx-auto px-4">
         <!-- Breadcrumb -->
-        <nav class="mb-6 text-sm">
+        <nav class="mb-6 text-sm overflow-scroll">
             <ol class="flex items-center space-x-2 text-gray-600">
                 <li>
                     <a href="/home" class="hover:text-blue-600" 
@@ -76,9 +76,9 @@
                         </a>
                     </li>
                 {/if}
-                <li class="flex items-center">
+                <li class="flex items-center ">
                     <span class="mx-2">/</span>
-                    <span class="text-gray-900">{product.name}</span>
+                    <span class="text-gray-900 text-nowrap">{product.name.split(" ").slice("0","15").join(" ")}</span>
                 </li>
             </ol>
         </nav>

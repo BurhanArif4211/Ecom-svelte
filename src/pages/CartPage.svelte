@@ -44,11 +44,10 @@
         </div>
     {:else if $cart.items_count === 0}
         <div class="text-center py-16">
-            <h2 class="text-2xl font-semibold mb-4">Your cart is empty</h2>
+            <h2 class="text-2xl text-white font-semibold mb-4">Your cart is empty</h2>
             <button 
-                on:click={() => router.navigate('/')}
-                class="inline-block bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700"
-            >
+                on:click={() => router.navigate('/products')}
+                class="inline-block bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700">
                 Continue Shopping
             </button>
         </div>
@@ -60,8 +59,8 @@
                         {#each $cart.items as item}
                             <div class="p-6 flex flex-col sm:flex-row items-center">
                                 <div class="flex-shrink-0 w-24 h-24 bg-gray-200 rounded-lg overflow-hidden">
-                                    {#if item.image}
-                                        <img src={item.image.src} alt={item.name} class="w-full h-full object-cover" />
+                                    {#if item.images}
+                                        <img src={item.images[0].src} alt={item.name} class="w-full h-full object-cover" />
                                     {:else}
                                         <div class="w-full h-full flex items-center justify-center text-gray-500">
                                             No image
@@ -71,7 +70,7 @@
                                 
                                 <div class="mt-4 sm:mt-0 sm:ml-6 flex-grow">
                                     <h3 class="text-lg font-medium">{item.name}</h3>
-                                    <p class="mt-1 text-gray-600">${item.price}</p>
+                                    <p class="mt-1 text-gray-600">{item.price}</p>
                                 </div>
                                 
                                 <div class="mt-4 sm:mt-0 flex items-center">
@@ -115,7 +114,7 @@
                     <div class="space-y-4">
                         <div class="flex justify-between">
                             <span>Subtotal</span>
-                            <span>${$cart.total}</span>
+                            <span>{$cart.totals.total_items}</span>
                         </div>
                         <div class="flex justify-between">
                             <span>Shipping</span>
@@ -123,7 +122,7 @@
                         </div>
                         <div class="flex justify-between border-t border-gray-200 pt-4">
                             <span class="font-medium">Total</span>
-                            <span class="font-bold">${$cart.total}</span>
+                           <span>{$cart.totals.currency_code} <span class="font-bold">{$cart.totals.total_items}</span></span>
                         </div>
                     </div>
                     

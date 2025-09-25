@@ -1,13 +1,13 @@
 <script>
+
     import { onMount } from "svelte";
     import Carousel from "../components/Carousel.svelte";
     import ProductCard from "../components/ProductCard.svelte";
     
-
     // State management
-    let featuredProducts = [];
     let productCategories = [];
     let products = [];
+    let featuredProducts = [];
     let isLoading = true;
     let error = null;
 
@@ -35,38 +35,13 @@
 
     onMount(fetchData);
 </script>
-{#if isLoading}
+    {#if isLoading}
         <div class="flex justify-center items-center h-screen">
             <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
         </div>
     {:else if error}
         <div class="text-red-500 text-center p-8">Error: {error}</div>
     {:else}
-        <!-- Featured Products Carousel -->
-        <section class="mb-16">
-            <Carousel items={featuredProducts} let:item>
-                <div class="relative h-[200px] md:h-[300px]">
-                    <img 
-                        src={item.images[0]?.src || 'https://via.placeholder.com/1200x600'} 
-                        alt={item.name}
-                        class="w-full h-full object-cover"
-                    />
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center">
-                        <div class="container mx-auto px-4 text-white max-w-4xl">
-                            <h2 class="text-2xl md:text-3xl font-bold mb-4">{item.name.split(" ").slice(0,5).join(' ')}</h2>
-                            
-                            <a 
-                                href={`/products/${item.id}`} 
-                                class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
-                            >
-                                Shop Now
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </Carousel>
-        </section>
-
         <!-- Categories Carousel -->
         <section class="container mx-auto px-4 mb-16">
             <h2 class="text-3xl font-bold text-center mb-10">Shop Categories</h2>
@@ -79,10 +54,14 @@
                 >
                     <a 
                         href={`/category/${item.id}`} 
-                        class="block group text-center p-4"
+                        class="block group text-center border-2 border-dashed border-white m-4 rounded-2xl"
                     >
+                    {#if item.image}
                         <img src={`${(item.image !=null) ? item?.image?.src:''}`} class="border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-3" />
-                        <h3 class="text-lg font-semibold group-hover:text-blue-600 transition-colors">
+                    {:else}
+                        <div class="w-16 h-16 mb-3"></div>
+                    {/if}
+                        <h3 class="text-lg text-white font-semibold group-hover:text-blue-600 transition-colors">
                             {item.name}
                         </h3>
                         <p class="text-gray-500 text-sm">({item.count} items)</p>
@@ -97,24 +76,18 @@
                 <h2 class="text-3xl font-bold">Featured Products</h2>
                 <a href="/products" class="text-blue-600 hover:underline">View All Products</a>
             </div>
-            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {#each featuredProducts as featuredProduct}
+                    <ProductCard product={featuredProduct} />
+                {/each}
+            </div>
+            <div class="mb-10"></div>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {#each products as product}
                     <ProductCard {product} />
                 {/each}
             </div>
+
         </section>
 
-        <!-- Promotional Banner -->
-        <section class="bg-blue-800 text-white py-16 mb-16">
-            <div class="container mx-auto px-4 text-center">
-                <h2 class="text-4xl font-bold mb-4">Summer Sale</h2>
-                <p class="text-xl mb-8 max-w-2xl mx-auto">
-                    Up to 50% off on seasonal items. Limited time offer!
-                </p>
-                <button class="bg-white text-blue-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-300">
-                    Shop the Sale
-                </button>
-            </div>
-        </section>
     {/if}

@@ -165,20 +165,20 @@ const updateCustomerInfo = async () => {
     };
 </script>
 
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-black py-8">
     <div class="container mx-auto px-4">
         {#if orderPlaced}
             <!-- Order Confirmation -->
-            <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="max-w-3xl mx-auto bg-gray-900 rounded-xl shadow-md overflow-hidden">
                 <div class="p-8 text-center">
-                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div class="w-20 h-20 bg-green-300 rounded-full flex items-center justify-center mx-auto mb-6">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
                     
-                    <h1 class="text-3xl font-bold text-gray-900 mb-4">Order Confirmed!</h1>
-                    <p class="text-gray-600 mb-6">Thank you for your purchase. Your order has been placed successfully.</p>
+                    <h1 class="text-3xl font-bold text-gray-100 mb-4">Order Confirmed!</h1>
+                    <p class="text-gray-300 mb-6">Thank you for your purchase. Your order has been placed successfully.</p>
                     
                     <div class="bg-gray-50 rounded-lg p-6 mb-8 text-left">
                         <h2 class="text-xl font-semibold mb-4">Order Details</h2>
@@ -232,14 +232,14 @@ const updateCustomerInfo = async () => {
         {:else}
             <!-- Checkout Form -->
             <div class="max-w-6xl mx-auto">
-                <h1 class="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+                <h1 class="text-3xl font-bold text-white mb-8">Checkout</h1>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Left Column - Forms -->
                     <div class="lg:col-span-2 space-y-8">
                         <!-- Billing Address -->
-                        <div class="bg-white rounded-xl shadow-md p-6">
-                            <h2 class="text-xl font-bold mb-6">Billing Details</h2>
+                        <div class="bg-gray-900 rounded-xl shadow-md p-6">
+                            <h2 class="text-white text-xl font-bold mb-6">Billing Details</h2>
                             
                             {#if error}
                                 <div class="bg-red-50 text-red-700 p-4 rounded-lg mb-6">
@@ -249,7 +249,7 @@ const updateCustomerInfo = async () => {
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block text-gray-700 mb-2">First Name *</label>
+                                    <label class="block text-gray-300 mb-2">First Name *</label>
                                     <input 
                                         type="text" 
                                         bind:value={billing.first_name}
@@ -258,7 +258,7 @@ const updateCustomerInfo = async () => {
                                     />
                                 </div>
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Last Name *</label>
+                                    <label class="block text-gray-300 mb-2">Last Name *</label>
                                     <input 
                                         type="text" 
                                         bind:value={billing.last_name}
@@ -267,7 +267,7 @@ const updateCustomerInfo = async () => {
                                     />
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-gray-700 mb-2">Company Name</label>
+                                    <label class="block text-gray-300 mb-2">Company Name</label>
                                     <input 
                                         type="text" 
                                         bind:value={billing.company}
@@ -275,23 +275,23 @@ const updateCustomerInfo = async () => {
                                     />
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-gray-700 mb-2">Street Address *</label>
+                                    <label class="block text-gray-300 mb-2">Street Address *</label>
                                     <input 
                                         type="text" 
                                         bind:value={billing.address_1}
                                         placeholder="House number and street name"
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 mb-3"
+                                        class="placeholder-blue-300 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 mb-3"
                                         required
                                     />
                                     <input 
                                         type="text" 
                                         bind:value={billing.address_2}
                                         placeholder="Apartment, suite, unit, etc. (optional)"
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                        class="placeholder-blue-300 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Town / City *</label>
+                                    <label class="block text-gray-300 mb-2">Town / City *</label>
                                     <input 
                                         type="text" 
                                         bind:value={billing.city}
@@ -300,7 +300,7 @@ const updateCustomerInfo = async () => {
                                     />
                                 </div>
                                 <div>
-                                    <label class="block text-gray-700 mb-2">State / County *</label>
+                                    <label class="block text-gray-300 mb-2">State / County *</label>
                                     <input 
                                         type="text" 
                                         bind:value={billing.state}
@@ -309,7 +309,7 @@ const updateCustomerInfo = async () => {
                                     />
                                 </div>
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Postcode / ZIP *</label>
+                                    <label class="block text-gray-300 mb-2">Postcode / ZIP *</label>
                                     <input 
                                         type="text" 
                                         bind:value={billing.postcode}
@@ -318,7 +318,7 @@ const updateCustomerInfo = async () => {
                                     />
                                 </div>
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Country *</label>
+                                    <label class="block text-gray-300 mb-2">Country *</label>
                                     <select 
                                         bind:value={billing.country}
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
@@ -334,7 +334,7 @@ const updateCustomerInfo = async () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Phone *</label>
+                                    <label class="block text-gray-300 mb-2">Phone *</label>
                                     <input 
                                         type="tel" 
                                         bind:value={billing.phone}
@@ -343,7 +343,7 @@ const updateCustomerInfo = async () => {
                                     />
                                 </div>
                                 <div>
-                                    <label class="block text-gray-700 mb-2">Email Address *</label>
+                                    <label class="block text-gray-300 mb-2">Email Address *</label>
                                     <input 
                                         type="email" 
                                         bind:value={billing.email}
@@ -362,7 +362,7 @@ const updateCustomerInfo = async () => {
                                         on:change={toggleSameAddress}
                                         class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                     />
-                                    <label for="same-address" class="ml-2 text-gray-700">Ship to same address</label>
+                                    <label for="same-address" class="ml-2 text-gray-300">Ship to same address</label>
                                 </div>
                             </div>
                             
@@ -382,7 +382,7 @@ const updateCustomerInfo = async () => {
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-gray-700 mb-2">First Name *</label>
+                                        <label class="block text-gray-300 mb-2">First Name *</label>
                                         <input 
                                             type="text" 
                                             bind:value={shipping.first_name}
@@ -391,7 +391,7 @@ const updateCustomerInfo = async () => {
                                         />
                                     </div>
                                     <div>
-                                        <label class="block text-gray-700 mb-2">Last Name *</label>
+                                        <label class="block text-gray-300 mb-2">Last Name *</label>
                                         <input 
                                             type="text" 
                                             bind:value={shipping.last_name}
@@ -400,7 +400,7 @@ const updateCustomerInfo = async () => {
                                         />
                                     </div>
                                     <div class="md:col-span-2">
-                                        <label class="block text-gray-700 mb-2">Company Name</label>
+                                        <label class="block text-gray-300 mb-2">Company Name</label>
                                         <input 
                                             type="text" 
                                             bind:value={shipping.company}
@@ -408,23 +408,23 @@ const updateCustomerInfo = async () => {
                                         />
                                     </div>
                                     <div class="md:col-span-2">
-                                        <label class="block text-gray-700 mb-2">Street Address *</label>
+                                        <label class="block text-gray-300 mb-2">Street Address *</label>
                                         <input 
                                             type="text" 
                                             bind:value={shipping.address_1}
                                             placeholder="House number and street name"
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 mb-3"
+                                            class="placeholder-blue-300 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 mb-3"
                                             required
                                         />
                                         <input 
                                             type="text" 
                                             bind:value={shipping.address_2}
                                             placeholder="Apartment, suite, unit, etc. (optional)"
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            class="placeholder-blue-300 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                         />
                                     </div>
                                     <div>
-                                        <label class="block text-gray-700 mb-2">Town / City *</label>
+                                        <label class="block text-gray-300 mb-2">Town / City *</label>
                                         <input 
                                             type="text" 
                                             bind:value={shipping.city}
@@ -433,7 +433,7 @@ const updateCustomerInfo = async () => {
                                         />
                                     </div>
                                     <div>
-                                        <label class="block text-gray-700 mb-2">State / County *</label>
+                                        <label class="block text-gray-300 mb-2">State / County *</label>
                                         <input 
                                             type="text" 
                                             bind:value={shipping.state}
@@ -442,7 +442,7 @@ const updateCustomerInfo = async () => {
                                         />
                                     </div>
                                     <div>
-                                        <label class="block text-gray-700 mb-2">Postcode / ZIP *</label>
+                                        <label class="block text-gray-300 mb-2">Postcode / ZIP *</label>
                                         <input 
                                             type="text" 
                                             bind:value={shipping.postcode}
@@ -451,7 +451,7 @@ const updateCustomerInfo = async () => {
                                         />
                                     </div>
                                     <div>
-                                        <label class="block text-gray-700 mb-2">Country *</label>
+                                        <label class="block text-gray-300 mb-2">Country *</label>
                                         <select 
                                             bind:value={shipping.country}
                                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
@@ -467,7 +467,7 @@ const updateCustomerInfo = async () => {
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-gray-700 mb-2">Phone *</label>
+                                        <label class="block text-gray-300 mb-2">Phone *</label>
                                         <input 
                                             type="tel" 
                                             bind:value={shipping.phone}
@@ -567,35 +567,35 @@ const updateCustomerInfo = async () => {
                                     <div class="mt-4 p-4 bg-gray-50 rounded-lg">
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label class="block text-gray-700 mb-2">Card Number</label>
+                                                <label class="block text-gray-300 mb-2">Card Number</label>
                                                 <input 
                                                     type="text" 
                                                     placeholder="1234 5678 9012 3456"
-                                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                                    class="placeholder-blue-300 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                                 />
                                             </div>
                                             <div>
-                                                <label class="block text-gray-700 mb-2">Cardholder Name</label>
+                                                <label class="block text-gray-300 mb-2">Cardholder Name</label>
                                                 <input 
                                                     type="text" 
                                                     placeholder="John Doe"
-                                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                                    class="placeholder-blue-300 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                                 />
                                             </div>
                                             <div>
-                                                <label class="block text-gray-700 mb-2">Expiration Date</label>
+                                                <label class="block text-gray-300 mb-2">Expiration Date</label>
                                                 <input 
                                                     type="text" 
                                                     placeholder="MM/YY"
-                                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                                    class="placeholder-blue-300 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                                 />
                                             </div>
                                             <div>
-                                                <label class="block text-gray-700 mb-2">CVV</label>
+                                                <label class="block text-gray-300 mb-2">CVV</label>
                                                 <input 
                                                     type="text" 
                                                     placeholder="123"
-                                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                                    class="placeholder-blue-300 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                                 />
                                             </div>
                                         </div>
@@ -607,12 +607,12 @@ const updateCustomerInfo = async () => {
                         <!-- Order Notes -->
                         <div class="bg-white rounded-xl shadow-md p-6">
                             <h2 class="text-xl font-bold mb-6">Additional Information</h2>
-                            <label class="block text-gray-700 mb-2">Order Notes (optional)</label>
+                            <label class="block text-gray-300 mb-2">Order Notes (optional)</label>
                             <textarea 
                                 bind:value={orderNotes}
                                 rows="4"
                                 placeholder="Notes about your order, e.g. special notes for delivery"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                class="placeholder-blue-300 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                             ></textarea>
                         </div>
                     </div>

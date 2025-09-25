@@ -66,14 +66,14 @@
     {#if showControls && items.length > getItemsPerView()}
         <button 
             on:click={prev}
-            class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-900 rounded-full p-2 shadow-md transition-all"
+            class="absolute left-2 top-1/2 -translate-y-1/2 bg-blue-300 hover:bg-white text-gray-200 rounded-full p-2 shadow-md transition-all"
             aria-label="Previous"
         >
             ❮
         </button>
         <button 
             on:click={next}
-            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-900 rounded-full p-2 shadow-md transition-all"
+            class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-300 hover:bg-white text-gray-200 rounded-full p-2 shadow-md transition-all"
             aria-label="Next"
         >
             ❯

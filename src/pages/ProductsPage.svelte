@@ -2,155 +2,97 @@
 <script>
     import { onMount } from 'svelte';
     import ProductCard from '../components/ProductCard.svelte';
-    import { fetchProducts, fetchCategories } from '../lib/stores';
-    import { router } from '../router';
+    import Pagination from '../components/Pagination.svelte';
     
-    // Props
-    export let categoryId = null;
-    export let categoryName = '';
+    export let data; // From router
+    export let router;
     
-    // State
-    let products = [];
-    let categories = [];
-    let filteredProducts = [];
-    let isLoading = true;
-    let error = null;
+    let {
+        products = [],
+        categories = [],
+        pagination = {},
+        filters = {},
+        currentCategory = null
+    } = data || {};
     
-    // Filters
-    let searchQuery = '';
-    let selectedCategories = [];
-    let minPrice = '';
-    let maxPrice = '';
-    let sortBy = 'default';
-    let inStockOnly = false;
-    let onSaleOnly = false;
-    
-    // UI State
     let showFilters = false;
+    let localFilters = { ...filters };
     
-    // Initialize data
-    onMount(async () => {
-        try {
-            // Fetch categories if not already available
-            if (categories.length === 0) {
-                categories = await fetchCategories();
-            }
-            
-            // Fetch products based on category if provided
-            const params = {};
-            if (categoryId) {
-                params.category = categoryId;
-            }
-            
-            products = await fetchProducts(params);
-            filteredProducts = [...products];
-            
-        } catch (err) {
-            error = err.message || "Failed to load products";
-        } finally {
-            isLoading = false;
-        }
+    // Initialize local filters from router data
+    onMount(() => {
+        localFilters = { ...filters };
     });
     
-    // Apply filters
+    // Update URL with new filters
+    const updateURL = (newFilters = {}) => {
+        const queryParams = new URLSearchParams();
+        
+        // Add all active filters
+        Object.entries(newFilters).forEach(([key, value]) => {
+            if (value && value !== '') {
+                if (key === 'on_sale' || key === 'in_stock') {
+                    queryParams.set(key, value.toString());
+                } else {
+                    queryParams.set(key, value);
+                }
+            }
+        });
+        
+        // Reset to page 1 when filters change
+        queryParams.set('page', '1');
+        
+        const queryString = queryParams.toString();
+        const basePath = currentCategory ? `/category/${currentCategory.slug}` : '/products';
+        const newURL = queryString ? `${basePath}?${queryString}` : basePath;
+        
+        router.navigate(newURL);
+    };
+    
+    // Handle filter changes
+    const handleFilterChange = (key, value) => {
+        localFilters[key] = value;
+    };
+    
     const applyFilters = () => {
-        let result = [...products];
-        
-        // Search filter
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            result = result.filter(product => 
-                product.name.toLowerCase().includes(query) ||
-                product.description.toLowerCase().includes(query) ||
-                product.sku?.toLowerCase().includes(query)
-            );
-        }
-        
-        // Category filter
-        if (selectedCategories.length > 0) {
-            result = result.filter(product => 
-                product.categories?.some(cat => selectedCategories.includes(cat.id))
-            );
-        }
-        
-        // Price filter
-        if (minPrice) {
-            const min = parseFloat(minPrice);
-            result = result.filter(product => parseFloat(product.prices.price) >= min);
-        }
-        
-        if (maxPrice) {
-            const max = parseFloat(maxPrice);
-            result = result.filter(product => parseFloat(product.prices.price) <= max);
-        }
-        
-        // Stock filter
-        if (inStockOnly) {
-            result = result.filter(product => product.is_in_stock);
-        }
-        
-        // Sale filter
-        if (onSaleOnly) {
-            result = result.filter(product => product.on_sale);
-        }
-        
-        // Sorting
-        switch (sortBy) {
-            case 'price-low':
-                result.sort((a, b) => parseFloat(a.prices.price) - parseFloat(b.prices.price));
-                break;
-            case 'price-high':
-                result.sort((a, b) => parseFloat(b.prices.price) - parseFloat(a.prices.price));
-                break;
-            case 'name-asc':
-                result.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case 'name-desc':
-                result.sort((a, b) => b.name.localeCompare(a.name));
-                break;
-            case 'popularity':
-                // Assuming we have a rating property
-                result.sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0));
-                break;
-            default:
-                // Default sorting (newest first)
-                result.sort((a, b) => new Date(b.date_created) - new Date(a.date_created));
-        }
-        
-        filteredProducts = result;
+        updateURL(localFilters);
+    };
+    
+    const resetFilters = () => {
+        localFilters = {
+            search: '',
+            category: '',
+            min_price: '',
+            max_price: '',
+            on_sale: false,
+            in_stock: false,
+            orderby: 'date',
+            order: 'desc'
+        };
+        updateURL(localFilters);
     };
     
     // Handle search
-    const handleSearch = () => {
-        applyFilters();
-    };
-    
-    // Reset filters
-    const resetFilters = () => {
-        searchQuery = '';
-        selectedCategories = categoryId ? [parseInt(categoryId)] : [];
-        minPrice = '';
-        maxPrice = '';
-        sortBy = 'default';
-        inStockOnly = false;
-        onSaleOnly = false;
-        applyFilters();
-    };
-    
-    // Toggle category selection
-    const toggleCategory = (id) => {
-        if (selectedCategories.includes(id)) {
-            selectedCategories = selectedCategories.filter(catId => catId !== id);
-        } else {
-            selectedCategories = [...selectedCategories, id];
+    const handleSearch = (event) => {
+        if (event.key === 'Enter' || event.type === 'click') {
+            updateURL({ ...localFilters, search: localFilters.search });
         }
-        applyFilters();
     };
     
-    // Format price
+    // Handle pagination
+    const handlePageChange = (page) => {
+        const queryParams = new URLSearchParams(window.location.search);
+        queryParams.set('page', page.toString());
+        
+        const basePath = currentCategory ? `/category/${currentCategory.slug}` : '/products';
+        const newURL = `${basePath}?${queryParams.toString()}`;
+        
+        router.navigate(newURL);
+    };
+    
+    // Format price for display
     const formatPrice = (price) => {
         if (!price) return '';
-        return `${(parseFloat(price)).toFixed(2)}`;
+        return (parseFloat(price) / 100).toFixed(2);
     };
 </script>
 
@@ -159,17 +101,19 @@
         <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">
-                {#if categoryName}
-                    {categoryName}
+                {#if currentCategory}
+                    {currentCategory.name}
                 {:else}
-                    All Products
+                    {localFilters.search ? `Search Results for "${localFilters.search}"` : 'All Products'}
                 {/if}
             </h1>
             <p class="text-gray-600 mt-2">
-                {#if categoryName}
-                    Browse our collection of {categoryName.toLowerCase()} products
+                {#if currentCategory}
+                    {pagination.totalItems} products found in {currentCategory.name}
+                {:else if localFilters.search}
+                    {pagination.totalItems} products found for "{localFilters.search}"
                 {:else}
-                    Explore our complete product catalog
+                    {pagination.totalItems} products available
                 {/if}
             </p>
         </div>
@@ -181,10 +125,10 @@
                 <div class="relative">
                     <input
                         type="text"
-                        bind:value={searchQuery}
+                        bind:value={localFilters.search}
                         placeholder="Search products..."
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 pr-12"
-                        on:input={handleSearch}
+                        on:keypress={(e) => e.key === 'Enter' && handleSearch(e)}
                     />
                     <button 
                         on:click={handleSearch}
@@ -209,20 +153,40 @@
             </button>
             
             <!-- Sort Dropdown -->
-            <div class="w-full md:w-auto">
+            <div class="w-full md:w-48">
                 <select 
-                    bind:value={sortBy}
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    bind:value={localFilters.orderby}
                     on:change={applyFilters}
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                 >
-                    <option value="default">Sort by: Default</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="name-asc">Name: A to Z</option>
-                    <option value="name-desc">Name: Z to A</option>
-                    <option value="popularity">Popularity</option>
+                    <option value="date">Sort by: Newest</option>
+                    <option value="price">Sort by: Price</option>
+                    <option value="popularity">Sort by: Popularity</option>
+                    <option value="rating">Sort by: Rating</option>
+                    <option value="title">Sort by: Name</option>
                 </select>
             </div>
+            
+            <!-- Order Toggle -->
+            <button 
+                on:click={() => {
+                    localFilters.order = localFilters.order === 'asc' ? 'desc' : 'asc';
+                    applyFilters();
+                }}
+                class="w-full md:w-auto bg-white border border-gray-300 rounded-lg px-4 py-3 hover:bg-gray-50 flex items-center justify-center"
+            >
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class="h-5 w-5 transform transition-transform" 
+                    class:rotate-180={localFilters.order === 'asc'}
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+                </svg>
+                <span class="ml-2">{localFilters.order === 'asc' ? 'Ascending' : 'Descending'}</span>
+            </button>
         </div>
         
         <div class="flex flex-col md:flex-row gap-8">
@@ -235,7 +199,7 @@
                             on:click={resetFilters}
                             class="text-blue-600 hover:text-blue-800 text-sm"
                         >
-                            Reset
+                            Reset All
                         </button>
                     </div>
                     
@@ -243,20 +207,22 @@
                     <div class="mb-6">
                         <h3 class="font-bold mb-3">Categories</h3>
                         <div class="space-y-2 max-h-60 overflow-y-auto">
-                            {#each categories as category}
+                            {#each categories as cat}
                                 <div class="flex items-center">
                                     <input 
-                                        type="checkbox" 
-                                        id={`category-${category.id}`}
-                                        checked={selectedCategories.includes(category.id)}
-                                        on:change={() => toggleCategory(category.id)}
+                                        type="radio" 
+                                        id={`category-${cat.id}`}
+                                        name="category"
+                                        checked={localFilters.category === cat.id.toString()}
+                                        on:change={() => handleFilterChange('category', cat.id.toString())}
                                         class="h-4 w-4 text-blue-600 rounded"
                                     />
                                     <label 
-                                        for={`category-${category.id}`} 
-                                        class="ml-2 text-gray-700"
+                                        for={`category-${cat.id}`} 
+                                        class="ml-2 text-gray-700 flex justify-between w-full"
                                     >
-                                        {category.name} ({category.count})
+                                        <span>{cat.name}</span>
+                                        <span class="text-gray-400 text-sm">({cat.count || 0})</span>
                                     </label>
                                 </div>
                             {/each}
@@ -271,20 +237,18 @@
                                 <label class="block text-sm text-gray-500 mb-1">Min Price</label>
                                 <input 
                                     type="number" 
-                                    bind:value={minPrice}
-                                    placeholder="Min"
+                                    bind:value={localFilters.min_price}
+                                    placeholder="0"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    on:input={applyFilters}
                                 />
                             </div>
                             <div>
                                 <label class="block text-sm text-gray-500 mb-1">Max Price</label>
                                 <input 
                                     type="number" 
-                                    bind:value={maxPrice}
-                                    placeholder="Max"
+                                    bind:value={localFilters.max_price}
+                                    placeholder="1000"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    on:input={applyFilters}
                                 />
                             </div>
                         </div>
@@ -292,14 +256,13 @@
                     
                     <!-- Stock Status -->
                     <div class="mb-6">
-                        <h3 class="font-bold mb-3">Stock Status</h3>
+                        <h3 class="font-bold mb-3">Availability</h3>
                         <div class="space-y-2">
                             <div class="flex items-center">
                                 <input 
                                     type="checkbox" 
                                     id="in-stock"
-                                    bind:checked={inStockOnly}
-                                    on:change={applyFilters}
+                                    bind:checked={localFilters.in_stock}
                                     class="h-4 w-4 text-blue-600 rounded"
                                 />
                                 <label for="in-stock" class="ml-2 text-gray-700">In Stock Only</label>
@@ -315,8 +278,7 @@
                                 <input 
                                     type="checkbox" 
                                     id="on-sale"
-                                    bind:checked={onSaleOnly}
-                                    on:change={applyFilters}
+                                    bind:checked={localFilters.on_sale}
                                     class="h-4 w-4 text-blue-600 rounded"
                                 />
                                 <label for="on-sale" class="ml-2 text-gray-700">On Sale Items</label>
@@ -335,13 +297,7 @@
             
             <!-- Products Grid -->
             <div class="flex-grow">
-                {#if isLoading}
-                    <div class="flex justify-center items-center h-64">
-                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                    </div>
-                {:else if error}
-                    <div class="text-red-500 text-center p-8">Error: {error}</div>
-                {:else if filteredProducts.length === 0}
+                {#if products.length === 0}
                     <div class="bg-white rounded-xl shadow-md p-8 text-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -358,55 +314,109 @@
                         </button>
                     </div>
                 {:else}
+                    <!-- Active Filters -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        {#if localFilters.search}
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center">
+                                Search: "{localFilters.search}"
+                                <button 
+                                    on:click={() => {
+                                        localFilters.search = '';
+                                        applyFilters();
+                                    }}
+                                    class="ml-2 hover:text-blue-600"
+                                >
+                                    ×
+                                </button>
+                            </span>
+                        {/if}
+                        
+                        {#if localFilters.category}
+                            {#if categories.find(c => c.id.toString() === localFilters.category)}
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center">
+                                    Category: {categories.find(c => c.id.toString() === localFilters.category).name}
+                                    <button 
+                                        on:click={() => {
+                                            localFilters.category = '';
+                                            applyFilters();
+                                        }}
+                                        class="ml-2 hover:text-green-600"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            {/if}
+                        {/if}
+                        
+                        {#if localFilters.min_price || localFilters.max_price}
+                            <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center">
+                                Price: ${localFilters.min_price || '0'} - ${localFilters.max_price || '∞'}
+                                <button 
+                                    on:click={() => {
+                                        localFilters.min_price = '';
+                                        localFilters.max_price = '';
+                                        applyFilters();
+                                    }}
+                                    class="ml-2 hover:text-purple-600"
+                                >
+                                    ×
+                                </button>
+                            </span>
+                        {/if}
+                        
+                        {#if localFilters.on_sale}
+                            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm flex items-center">
+                                On Sale
+                                <button 
+                                    on:click={() => {
+                                        localFilters.on_sale = false;
+                                        applyFilters();
+                                    }}
+                                    class="ml-2 hover:text-red-600"
+                                >
+                                    ×
+                                </button>
+                            </span>
+                        {/if}
+                        
+                        {#if localFilters.in_stock}
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center">
+                                In Stock
+                                <button 
+                                    on:click={() => {
+                                        localFilters.in_stock = false;
+                                        applyFilters();
+                                    }}
+                                    class="ml-2 hover:text-green-600"
+                                >
+                                    ×
+                                </button>
+                            </span>
+                        {/if}
+                    </div>
+                    
+                    <!-- Products Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {#each filteredProducts as product}
-                            <ProductCard {product} />
+                        {#each products as product}
+                            <ProductCard 
+                                {product} 
+                                on:click={() => router.navigate(`/product/${product.id}`)}
+                            />
                         {/each}
                     </div>
                     
                     <!-- Pagination -->
-                    <div class="mt-8 flex justify-center">
-                        <nav class="flex items-center gap-2">
-                            <button class="px-3 py-2 rounded-md bg-white border border-gray-300 hover:bg-gray-50">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                </svg>
-                            </button>
-                            
-                            <button class="px-4 py-2 rounded-md bg-blue-600 text-white font-medium">1</button>
-                            <button class="px-4 py-2 rounded-md bg-white border border-gray-300 hover:bg-gray-50">2</button>
-                            <button class="px-4 py-2 rounded-md bg-white border border-gray-300 hover:bg-gray-50">3</button>
-                            
-                            <button class="px-3 py-2 rounded-md bg-white border border-gray-300 hover:bg-gray-50">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                        </nav>
-                    </div>
+                    {#if pagination.totalPages > 1}
+                        <div class="mt-8">
+                            <Pagination 
+                                currentPage={pagination.currentPage}
+                                totalPages={pagination.totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        </div>
+                    {/if}
                 {/if}
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    /* Custom scrollbar for categories */
-    .overflow-y-auto::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    .overflow-y-auto::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-    
-    .overflow-y-auto::-webkit-scrollbar-thumb {
-        background: #c5c5c5;
-        border-radius: 10px;
-    }
-    
-    .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
-</style>
