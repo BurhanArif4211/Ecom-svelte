@@ -1,8 +1,11 @@
 <!-- src/pages/CheckoutPage.svelte -->
 <script>
+// @ts-nocheck
+
     import { onMount } from 'svelte';
     import { cart, fetchCart, updateCustomer, selectShippingRate, placeOrder } from '../lib/stores';
     import { router } from './../router';
+    import { get } from 'svelte/store';
     
     // Form state - simplified for Pakistan COD
     let billing = {
@@ -110,8 +113,10 @@
         try {
             isLoading = true;
             selectedShipping = rateId;
+            console.log(get(cart))
             await selectShippingRate(rateId);
             await fetchCart(); // Refresh cart with updated shipping
+            
             error = null;
         } catch (err) {
             error = err.message || "Failed to select shipping method";
@@ -378,27 +383,27 @@
                             <div class="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800">
                                 <h2 class="text-xl font-bold mb-6 text-white">Shipping Methods</h2>
                                 
-                                {#if $cart.shipping_rates && $cart.shipping_rates.length > 0}
+                                {#if $cart.shipping_rates.length > 0}
                                     <div class="space-y-4">
-                                        {#each $cart.shipping_rates as rate}
+                                        {$cart.shipping_rates[0].shipping_rates[0].name}
                                             <div class="flex items-center border border-gray-700 rounded-lg p-4 hover:border-blue-500 transition-colors">
                                                 <input 
                                                     type="radio" 
-                                                    id={`shipping-${rate.rate_id}`} 
+                                                    id={`shipping-${$cart.shipping_rates[0].shipping_rates[0].rate_id}`} 
                                                     name="shipping-method" 
-                                                    checked={selectedShipping === rate.rate_id}
-                                                    on:change={() => selectShipping(rate.rate_id)}
+                                                    checked={selectedShipping === $cart.shipping_rates[0].shipping_rates[0].rate_id}
+                                                    on:change={() => selectShipping($cart.shipping_rates[0].shipping_rates[0].rate_id)}
                                                     class="h-5 w-5 text-blue-600 bg-gray-800 border-gray-600"
                                                 />
-                                                <label for={`shipping-${rate.rate_id}`} class="ml-3 flex-grow">
+                                                <label for={`shipping-${$cart.shipping_rates[0].shipping_rates[0].rate_id}`} class="ml-3 flex-grow">
                                                     <div class="flex justify-between">
-                                                        <span class="font-medium text-white">{rate.name}</span>
-                                                        <span class="font-bold text-green-400">{formatPrice(rate.price)}</span>
+                                                        <span class="font-medium text-white">{$cart.shipping_rates[0].shipping_rates[0].name}</span>
+                                                        <span class="font-bold text-green-400">{formatPrice($cart.shipping_rates[0].shipping_rates[0].price)}</span>
                                                     </div>
-                                                    <p class="text-gray-400 text-sm mt-1">{rate.description}</p>
+                                                    <p class="text-gray-400 text-sm mt-1">{$cart.shipping_rates[0].shipping_rates[0].description}</p>
                                                 </label>
                                             </div>
-                                        {/each}
+                                        
                                     </div>
                                 {:else}
                                     <div class="text-gray-400 italic">

@@ -36,14 +36,14 @@
 </script>
 
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Your Shopping Cart</h1>
+    <h1 class="text-gray-200 text-3xl font-bold mb-8">Your Shopping Cart</h1>
     
     {#if $cart.isLoading || isLoading}
         <div class="flex justify-center items-center h-64">
             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
     {:else if $cart.items_count === 0}
-        <div class="text-center py-16">
+        <div class="text-center py-16 text-gray-300">
             <h2 class="text-2xl text-white font-semibold mb-4">Your cart is empty</h2>
             <button 
                 on:click={() => router.navigate('/products')}
@@ -54,23 +54,23 @@
     {:else}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2">
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-black rounded-lg shadow-md overflow-hidden">
                     <div class="divide-y divide-gray-200">
                         {#each $cart.items as item}
-                            <div class="p-6 flex flex-col sm:flex-row items-center">
+                            <div class="bg-gray-900 p-6 flex flex-col sm:flex-row items-center">
                                 <div class="flex-shrink-0 w-24 h-24 bg-gray-200 rounded-lg overflow-hidden">
                                     {#if item.images}
                                         <img src={item.images[0].src} alt={item.name} class="w-full h-full object-cover" />
                                     {:else}
-                                        <div class="w-full h-full flex items-center justify-center text-gray-500">
+                                        <div class="w-full h-full flex items-center justify-center text-gray-300">
                                             No image
                                         </div>
                                     {/if}
                                 </div>
                                 
                                 <div class="mt-4 sm:mt-0 sm:ml-6 flex-grow">
-                                    <h3 class="text-lg font-medium">{item.name}</h3>
-                                    <p class="mt-1 text-gray-600">{item.price}</p>
+                                    <h3 class="text-gray-200 text-lg font-medium">{item.name}</h3>
+                                    <p class="text-gray-200 mt-1 ">{item.price}</p>
                                 </div>
                                 
                                 <div class="mt-4 sm:mt-0 flex items-center">
@@ -86,7 +86,7 @@
                                         min="1" 
                                         value={item.quantity}
                                         on:change={(e) => handleQuantityChange(item.key, parseInt(e.target.value) || 1)}
-                                        class="w-12 h-8 text-center border-t border-b border-gray-200"
+                                        class="w-12 h-8 text-center border-t border-b text-gray-300 border-gray-200"
                                     />
                                     <button 
                                         on:click={() => handleQuantityChange(item.key, item.quantity + 1)}
@@ -109,19 +109,19 @@
             </div>
             
             <div>
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+                <div class="bg-gray-900 rounded-lg shadow-md p-6">
+                    <h2 class="text-xl text-gray-300 font-semibold mb-4">Order Summary</h2>
                     <div class="space-y-4">
-                        <div class="flex justify-between">
+                        <div class="text-gray-300 flex justify-between">
                             <span>Subtotal</span>
                             <span>{$cart.totals.total_items}</span>
                         </div>
-                        <div class="flex justify-between">
+                        <div class="text-gray-300 flex justify-between">
                             <span>Shipping</span>
                             <span>Calculated at checkout</span>
                         </div>
-                        <div class="flex justify-between border-t border-gray-200 pt-4">
-                            <span class="font-medium">Total</span>
+                        <div class="text-gray-300 flex justify-between border-t border-gray-200 pt-4">
+                            <span class="text-gray-300 font-medium">Total</span>
                            <span>{$cart.totals.currency_code} <span class="font-bold">{$cart.totals.total_items}</span></span>
                         </div>
                     </div>

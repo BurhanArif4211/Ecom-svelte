@@ -1,5 +1,4 @@
 <script>
-
     import { onMount } from "svelte";
     import Carousel from "../components/Carousel.svelte";
     import ProductCard from "../components/ProductCard.svelte";
@@ -73,8 +72,7 @@
         <!-- Product Grid -->
         <section class="container mx-auto px-4 mb-16">
             <div class="flex justify-between items-center mb-10">
-                <h2 class="text-3xl font-bold">Featured Products</h2>
-                <a href="/products" class="text-blue-600 hover:underline">View All Products</a>
+                <h2 class="text-3xl text-gray-300 font-bold">Featured Products</h2>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {#each featuredProducts as featuredProduct}
@@ -82,6 +80,9 @@
                 {/each}
             </div>
             <div class="mb-10"></div>
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-3xl text-gray-300 font-bold">All Products</h2>
+            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {#each products as product}
                     <ProductCard {product} />
