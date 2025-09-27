@@ -243,6 +243,8 @@ export const updateCustomer = async (data) => {
 
 // Place order - corrected to match API spec
 export const placeOrder = async (data) => {
+    // Scroll to top on navigation
+    window.scrollTo(0, 0);
     try {
         // Prepare payload according to API spec
         const payload = {
@@ -293,7 +295,35 @@ export const placeOrder = async (data) => {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Failed to place order');
         }
-        
+        //reset the cart
+        cart.set({
+            items: [],
+            items_count: 0,
+            items_weight: 0,
+            needs_payment: false,
+            needs_shipping: false,
+            totals: {
+                total_items: "0",
+                total_items_tax: "0",
+                total_fees: "0",
+                total_fees_tax: "0",
+                total_discount: "0",
+                total_discount_tax: "0",
+                total_shipping: "0",
+                total_shipping_tax: "0",
+                total_price: get(cart).totals.total_price,
+                total_tax: "0",
+                tax_lines: [],
+                currency_code: "RS",
+                currency_symbol: "Rs",
+                currency_minor_unit: 2,
+                currency_decimal_separator: ".",
+                currency_thousand_separator: ",",
+                currency_prefix: "Rs",
+                currency_suffix: ""
+            },
+            isLoading: false
+        });
         return await response.json();
     } catch (error) {
         console.error('Place order error:', error);

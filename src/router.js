@@ -117,80 +117,6 @@ export const routes = {
     }
   },
   
-  // Category routes
-  '/category/:slug': {
-    component: () => import('./pages/ProductsPage.svelte'),
-    name: 'Category',
-    data: async (params) => {
-        try {
-            const queryParams = new URLSearchParams(window.location.search);
-            const page = parseInt(queryParams.get('page')) || 1;
-            const per_page = 12;
-            
-            // First, get category ID from slug
-            const categoriesResponse = await fetch(
-                `/wp/wp-json/wc/store/products/categories?slug=${params.slug}`
-            );
-            
-            if (!categoriesResponse.ok) {
-                throw new Error(`HTTP error! status: ${categoriesResponse.status}`);
-            }
-            
-            const categories = await categoriesResponse.json();
-            
-            if (categories.length === 0) {
-                throw new Error('CATEGORY_NOT_FOUND');
-            }
-            
-            const category = categories[0];
-            
-            // Build products URL with category filter
-            let url = `/wp/wp-json/wc/store/products?category=${category.id}&per_page=${per_page}&page=${page}`;
-            
-            // Add sorting if specified
-            const orderby = queryParams.get('orderby') || 'date';
-            const order = queryParams.get('order') || 'desc';
-            url += `&orderby=${orderby}&order=${order}`;
-            
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
-            // Extract pagination info
-            const totalItems = parseInt(response.headers.get('x-wp-total')) || 0;
-            const totalPages = parseInt(response.headers.get('x-wp-totalpages')) || 1;
-            
-            const products = await response.json();
-            
-            // Fetch all categories for sidebar
-            const allCategoriesResponse = await fetch('/wp/wp-json/wc/store/products/categories?per_page=100&hide_empty=true');
-            const allCategories = allCategoriesResponse.ok ? await allCategoriesResponse.json() : [];
-            
-            return {
-                products,
-                categories: allCategories,
-                pagination: {
-                    currentPage: page,
-                    totalPages,
-                    totalItems,
-                    perPage: per_page
-                },
-                filters: {
-                    category: category.id,
-                    orderby,
-                    order
-                },
-                currentCategory: category
-            };
-        } catch (error) {
-            if (error.message === 'CATEGORY_NOT_FOUND') {
-                throw new Error('CATEGORY_NOT_FOUND');
-            }
-            console.error('Error fetching category products:', error);
-            throw error;
-        }
-    }
-    },
-  
   // Fallback route
   '/404': {
     component: () => import('./pages/NotFound.svelte'),
@@ -275,7 +201,7 @@ function createRouter() {
     
     // Parse the path
     const { route, params } = parsePath(path);
-    
+    // Scroll to top on navigation
     try {
       // Load the component
       const componentModule = await route.component();
@@ -304,8 +230,7 @@ function createRouter() {
         error: null
       });
       
-      // Scroll to top on navigation
-      window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
       
     } catch (error) {
       console.error('Failed to load route:', error);
@@ -377,54 +302,3 @@ function createRouter() {
 }
 
 export const router = createRouter();
-
-// // src/router/router.js
-// import { writable } from 'svelte/store';
-
-// function parsePath(pathname) {
-//     // trim trailing slash
-//     let path = pathname.replace(/\/$/, '') || '/';
-//     (path === '/') ? path = '/home' : path = path; // normalize /home from /
-    
-//     // Match product pages
-//     const productMatch = path.match(/^\/product\/(\d+)$/);
-//     if (productMatch) {
-//         return { page: 'productPage', params: { id: productMatch[1] } };
-//     }
-    
-//     // Match cart page
-//     if (path === '/cart') {
-//         return { page: 'cartPage', params: {} };
-//     }
-    
-//     switch (path.toLowerCase()) {
-//         case '/home':
-//             return { page: 'home', params: {} };
-//         case '/cart':
-//             return { page: 'cartPage', params: {} };
-//         case '/checkout':
-//             return { page: 'checkoutPage', params: {} };
-//         default:
-//             return { page: 'notfound', params: {} };
-//     }
-// }
-
-// function createRouter() {
-//     const { subscribe, set } = writable(parsePath(window.location.pathname));
-    
-//     // respond to back/forward buttons
-//     window.addEventListener('popstate', () => {
-//         set(parsePath(window.location.pathname));
-//     });
-    
-//     return {
-//         subscribe,
-//         navigate(to) {
-//             const path = to.startsWith('/') ? to : `/${to}`;
-//             history.pushState({}, '', path);
-//             set(parsePath(path));
-//         }
-//     };
-// }
-
-// export const router = createRouter();

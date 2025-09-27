@@ -3,6 +3,8 @@
     import { onMount } from 'svelte';
     import ProductCard from '../components/ProductCard.svelte';
     import Pagination from '../components/Pagination.svelte';
+    import { cart } from '../lib/stores';
+    import { get } from 'svelte/store';
     
     export let data; // From router
     export let router;
@@ -42,7 +44,7 @@
         queryParams.set('page', '1');
         
         const queryString = queryParams.toString();
-        const basePath = currentCategory ? `/category/${currentCategory.slug}` : '/products';
+        const basePath = currentCategory ? `/products?category=${currentCategory.slug}` : '/products';
         const newURL = queryString ? `${basePath}?${queryString}` : basePath;
         
         router.navigate(newURL);
@@ -83,17 +85,12 @@
         const queryParams = new URLSearchParams(window.location.search);
         queryParams.set('page', page.toString());
         
-        const basePath = currentCategory ? `/category/${currentCategory.slug}` : '/products';
+        const basePath = currentCategory ? `/products?category=${currentCategory.slug}` : '/products';
         const newURL = `${basePath}?${queryParams.toString()}`;
         
         router.navigate(newURL);
     };
     
-    // Format price for display
-    const formatPrice = (price) => {
-        if (!price) return '';
-        return (parseFloat(price) / 100).toFixed(2);
-    };
 </script>
 
 <div class="min-h-screen bg-black py-8">
@@ -206,14 +203,14 @@
                                 <div class="flex items-center">
                                     <input 
                                         type="radio" 
-                                        id={`category-${cat.id}`}
+                                        id={`category-${cat.slug}`}
                                         name="category"
-                                        checked={localFilters.category === cat.id.toString()}
-                                        on:change={() => handleFilterChange('category', cat.id.toString())}
+                                        checked={localFilters.category === cat.slug.toString()}
+                                        on:change={() => handleFilterChange('category', cat.slug.toString())}
                                         class="h-4 w-4 text-blue-600 rounded"
                                     />
                                     <label 
-                                        for={`category-${cat.id}`} 
+                                        for={`category-${cat.slug}`} 
                                         class="ml-2 text-gray-300 flex justify-between w-full"
                                     >
                                         <span>{cat.name}</span>
@@ -234,7 +231,7 @@
                                     type="number" 
                                     bind:value={localFilters.min_price}
                                     placeholder="0"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-300"
+                                    class="w-full px-3 py-2 border text-gray-200 border-gray-300 rounded-md placeholder-gray-300"
                                 />
                             </div>
                             <div>
@@ -242,8 +239,8 @@
                                 <input 
                                     type="number" 
                                     bind:value={localFilters.max_price}
-                                    placeholder="1000"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-300"
+                                    placeholder="∞"
+                                    class="w-full px-3 py-2 border text-gray-200 border-gray-300 rounded-md placeholder-gray-300"
                                 />
                             </div>
                         </div>
@@ -293,12 +290,12 @@
             <!-- Products Grid -->
             <div class="flex-grow">
                 {#if products.length === 0}
-                    <div class="bg-white rounded-xl shadow-md p-8 text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="bg-gray-900 rounded-xl shadow-md p-8 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <h3 class="text-xl font-semibold mt-4">No products found</h3>
-                        <p class="text-gray-600 mt-2">
+                        <h3 class="text-gray-300 text-xl font-semibold mt-4">No products found</h3>
+                        <p class="text-gray-300 mt-2">
                             Try adjusting your filters or search query
                         </p>
                         <button 
@@ -345,7 +342,7 @@
                         
                         {#if localFilters.min_price || localFilters.max_price}
                             <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center">
-                                Price: ${localFilters.min_price || '0'} - ${localFilters.max_price || '∞'}
+                                Price: {get(cart).totals.currency_symbol} {localFilters.min_price || '0'} - {get(cart).totals.currency_symbol} {localFilters.max_price || '∞'}
                                 <button 
                                     on:click={() => {
                                         localFilters.min_price = '';

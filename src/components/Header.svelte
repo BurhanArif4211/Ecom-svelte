@@ -56,6 +56,8 @@
         </div>
     </div>
 </header>
+
 {#if showCartModal}
 <CartModal onClose={() => showCartModal = false} />
 {/if}
+<div class="h-0 xxl:h-[109px]"></div>

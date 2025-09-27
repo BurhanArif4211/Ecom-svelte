@@ -416,6 +416,7 @@
                         <!-- Order Notes -->
                         <div class="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800">
                             <h2 class="text-xl font-bold mb-6 text-white">Additional Information</h2>
+                            <!-- svelte-ignore a11y_label_has_associated_control -->
                             <label class="block text-gray-300 mb-2">Order Notes (optional)</label>
                             <textarea 
                                 bind:value={orderNotes}

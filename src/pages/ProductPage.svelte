@@ -45,15 +45,15 @@
     
     // Navigate to category
     const navigateToCategory = (category) => {
-        router.navigate(`/category/${category.slug}`);
+        router.navigate(`/products?category=${category.slug}`);
     };
 </script>
 
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-black py-8">
     <div class="container mx-auto px-4">
         <!-- Breadcrumb -->
-        <nav class="mb-6 text-sm overflow-scroll">
-            <ol class="flex items-center space-x-2 text-gray-600">
+        <nav class="mb-6 text-sm overflow-scroll sm:overflow-hidden">
+            <ol class="flex items-center space-x-2 text-gray-200">
                 <li>
                     <a href="/home" class="hover:text-blue-600" 
                        on:click|preventDefault={() => router.navigate('/home')}>
@@ -70,7 +70,7 @@
                 {#if product.categories && product.categories.length > 0}
                     <li class="flex items-center">
                         <span class="mx-2">/</span>
-                        <a href="#" class="hover:text-blue-600"
+                        <a href="" class="hover:text-blue-600"
                            on:click|preventDefault={() => navigateToCategory(product.categories[0])}>
                             {product.categories[0].name}
                         </a>
@@ -78,7 +78,7 @@
                 {/if}
                 <li class="flex items-center ">
                     <span class="mx-2">/</span>
-                    <span class="text-gray-900 text-nowrap">{product.name.split(" ").slice("0","15").join(" ")}</span>
+                    <span class=" text-nowrap">{product.name.split(" ").slice("0","15").join(" ")}</span>
                 </li>
             </ol>
         </nav>
@@ -88,7 +88,7 @@
                 <!-- Left Column - Images and Video -->
                 <div class="space-y-6">
                     <!-- Image Carousel -->
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="bg-gray-900 rounded-xl shadow-md overflow-hidden">
                         <ImageCarousel 
                             images={product.images} 
                             bind:selectedIndex={selectedImageIndex}
@@ -97,8 +97,8 @@
                     
                     <!-- YouTube Video -->
                     {#if youtubeUrl}
-                        <div class="bg-white rounded-xl shadow-md p-4">
-                            <h3 class="text-lg font-semibold mb-4">Product Video</h3>
+                        <div class="bg-gray-900 rounded-xl shadow-md p-4">
+                            <h3 class="text-white text-lg font-semibold mb-4">Product Video</h3>
                             <YouTubeEmbed url={youtubeUrl} />
                         </div>
                     {/if}
@@ -107,14 +107,14 @@
                 <!-- Right Column - Product Details -->
                 <div class="space-y-6">
                     <!-- Product Header -->
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+                    <div class="bg-gray-900 rounded-xl shadow-md p-6">
+                        <h1 class="text-2xl lg:text-3xl font-bold text-gray-200 mb-4">
                             {product.name}
                         </h1>
                         
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center space-x-4">
-                                <span class="text-3xl font-bold text-blue-600">
+                                <span class="text-4xl font-bold text-white text-shadow-amber-500">
                                     {formatPrice(product.prices.price)}
                                 </span>
                                 {#if product.on_sale && product.prices.regular_price !== product.prices.price}
@@ -138,7 +138,7 @@
                         </div>
                         
                         <!-- SKU and Categories -->
-                        <div class="flex flex-wrap gap-4 mb-6 text-sm text-gray-600">
+                        <div class="flex flex-wrap gap-4 mb-6 text-sm text-gray-300">
                             {#if product.sku}
                                 <div>
                                     <span class="font-medium">SKU:</span> {product.sku}
@@ -151,7 +151,7 @@
                                         {#each product.categories as category}
                                             <button 
                                                 on:click={() => navigateToCategory(category)}
-                                                class="text-blue-600 hover:text-blue-800 hover:underline"
+                                                class="text-blue-200 hover:text-blue-500 hover:underline"
                                             >
                                                 {category.name}
                                             </button>
@@ -163,13 +163,13 @@
                         </div>
                         
                         <!-- Add to Cart Section -->
-                        <div class="border-t border-gray-200 pt-6">
+                        <div class="border-t text-gray-300 border-gray-200 pt-6">
                             <div class="flex items-center space-x-4 mb-6">
-                                <label for="quantity" class="font-medium text-gray-700">Quantity:</label>
+                                <label for="quantity" class="font-medium ">Quantity:</label>
                                 <div class="flex items-center border border-gray-300 rounded-lg">
                                     <button 
                                         on:click={() => selectedQuantity > 1 && selectedQuantity--}
-                                        class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-gray-800 disabled:opacity-50"
+                                        class="w-10 h-10 flex items-center justify-center text-white hover:text-gray-800 disabled:opacity-50"
                                         disabled={selectedQuantity <= 1}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -177,15 +177,16 @@
                                         </svg>
                                     </button>
                                     <input 
-                                        type="number" 
+                                        type="tel" 
                                         id="quantity"
                                         min="1"
+                                        max="5"
                                         bind:value={selectedQuantity}
                                         class="w-16 h-10 text-center border-x border-gray-300 focus:outline-none"
                                     />
                                     <button 
                                         on:click={() => selectedQuantity++}
-                                        class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-gray-800"
+                                        class="w-10 h-10 flex items-center justify-center text-white hover:text-gray-800"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -212,15 +213,15 @@
                     </div>
                     
                     <!-- Product Tabs -->
-                    <div class="bg-white rounded-xl shadow-md">
+                    <div class="bg-gray-900 rounded-xl shadow-md">
                         <!-- Tab Headers -->
                         <div class="border-b border-gray-200">
                             <nav class="flex space-x-8 px-6">
                                 <button 
                                     class={`py-4 px-1 border-b-2 font-medium text-sm ${
                                         activeTab === 'description' 
-                                            ? 'border-blue-500 text-blue-600' 
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                            ? 'border-white text-white' 
+                                            : 'border-transparent text-gray-500 hover:text-blue-700 hover:border-gray-300'
                                     }`}
                                     on:click={() => activeTab = 'description'}
                                 >
@@ -230,8 +231,8 @@
                                     <button 
                                         class={`py-4 px-1 border-b-2 font-medium text-sm ${
                                             activeTab === 'tags' 
-                                                ? 'border-blue-500 text-blue-600' 
-                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                                ? 'border-white text-white' 
+                                                : 'border-transparent text-gray-500 hover:text-blue-700 hover:border-gray-300'
                                         }`}
                                         on:click={() => activeTab = 'tags'}
                                     >
@@ -242,8 +243,8 @@
                                     <button 
                                         class={`py-4 px-1 border-b-2 font-medium text-sm ${
                                             activeTab === 'specifications' 
-                                                ? 'border-blue-500 text-blue-600' 
-                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                                ? 'border-white text-white' 
+                                                : 'border-transparent text-gray-500 hover:text-blue-700 hover:border-gray-300'
                                         }`}
                                         on:click={() => activeTab = 'specifications'}
                                     >
@@ -256,13 +257,13 @@
                         <!-- Tab Content -->
                         <div class="p-6">
                             {#if activeTab === 'description'}
-                                <div class="prose max-w-none">
+                                <div class="prose text-white max-w-none">
                                     {@html product.description}
                                 </div>
                             {:else if activeTab === 'tags' && product.tags}
                                 <div class="flex flex-wrap gap-2">
                                     {#each product.tags as tag}
-                                        <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                                        <span class="bg-gray-700 text-gray-200 px-3 py-1 rounded-full text-sm">
                                             {tag.name}
                                         </span>
                                     {/each}
@@ -271,7 +272,7 @@
                                 <div class="space-y-4">
                                     {#each product.attributes as attribute}
                                         <div class="border-b border-gray-200 pb-4 last:border-b-0">
-                                            <h4 class="font-semibold text-gray-900 mb-2">{attribute.name}</h4>
+                                            <h4 class="font-semibold text-gray-100 mb-2">{attribute.name}</h4>
                                             <div class="text-gray-600">
                                                 {#if attribute.options}
                                                     {attribute.options.join(', ')}
@@ -288,7 +289,7 @@
                 </div>
             </div>
         {:else}
-            <div class="text-center py-16">
+            <div class="bg-gray-900 text-center py-16">
                 <h2 class="text-2xl font-semibold mb-4">Product not found</h2>
                 <button 
                     on:click={() => router.navigate('/products')}
