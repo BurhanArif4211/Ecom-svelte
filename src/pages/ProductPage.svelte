@@ -56,14 +56,14 @@
             <ol class="flex items-center space-x-2 text-gray-200">
                 <li>
                     <a href="/home" class="hover:text-blue-600" 
-                       on:click|preventDefault={() => router.navigate('/home')}>
+                       onclick={() => router.navigate('/home')}>
                         Home
                     </a>
                 </li>
                 <li class="flex items-center">
                     <span class="mx-2">/</span>
                     <a href="/products" class="hover:text-blue-600"
-                       on:click|preventDefault={() => router.navigate('/products')}>
+                       onclick={() => router.navigate('/products')}>
                         Products
                     </a>
                 </li>
@@ -71,7 +71,7 @@
                     <li class="flex items-center">
                         <span class="mx-2">/</span>
                         <a href="" class="hover:text-blue-600"
-                           on:click|preventDefault={() => navigateToCategory(product.categories[0])}>
+                           onclick={() => navigateToCategory(product.categories[0])}>
                             {product.categories[0].name}
                         </a>
                     </li>
@@ -97,7 +97,7 @@
                     
                     <!-- YouTube Video -->
                     {#if youtubeUrl}
-                        <div class="bg-gray-900 rounded-xl shadow-md p-4">
+                        <div class="bg-gray-900 rounded-xl shadow-md p-2 pt-3">
                             <h3 class="text-white text-lg font-semibold mb-4">Product Video</h3>
                             <YouTubeEmbed url={youtubeUrl} />
                         </div>
@@ -107,34 +107,34 @@
                 <!-- Right Column - Product Details -->
                 <div class="space-y-6">
                     <!-- Product Header -->
-                    <div class="bg-gray-900 rounded-xl shadow-md p-6">
-                        <h1 class="text-2xl lg:text-3xl font-bold text-gray-200 mb-4">
+                    <div class="bg-gray-900 rounded-xl shadow-md p-2">
+                        <h1 class="text-lg font-bold text-gray-200 mb-4">
                             {product.name}
                         </h1>
                         
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-left flex-col justify-between mb-4">
                             <div class="flex items-center space-x-4">
                                 <span class="text-4xl font-bold text-white text-shadow-amber-500">
                                     {formatPrice(product.prices.price)}
                                 </span>
-                                {#if product.on_sale && product.prices.regular_price !== product.prices.price}
-                                    <span class="text-lg text-gray-500 line-through">
+                                
+                            </div>
+                            {#if product.on_sale && product.prices.regular_price !== product.prices.price}
+                                    <span class="text-lg text-gray-300 line-through">
                                         {formatPrice(product.prices.regular_price)}
                                     </span>
                                     <span class="bg-red-100 text-red-800 text-sm px-2 py-1 rounded">
                                         Save {formatPrice(parseFloat(product.prices.regular_price) - parseFloat(product.prices.price))}
                                     </span>
                                 {/if}
-                            </div>
-                            
                             <!-- Stock Status -->
-                            <div class={`px-3 py-1 rounded-full text-sm font-medium ${
+                            <!-- <div class={`px-3 py-1 rounded-full text-sm font-medium ${
                                 product.is_in_stock 
                                     ? 'bg-green-100 text-green-800' 
                                     : 'bg-red-100 text-red-800'
                             }`}>
                                 {product.is_in_stock ? 'In Stock' : 'Out of Stock'}
-                            </div>
+                            </div> -->
                         </div>
                         
                         <!-- SKU and Categories -->
@@ -150,8 +150,8 @@
                                     <div class="flex flex-wrap gap-1">
                                         {#each product.categories as category}
                                             <button 
-                                                on:click={() => navigateToCategory(category)}
-                                                class="text-blue-200 hover:text-blue-500 hover:underline"
+                                                onclick={() => navigateToCategory(category)}
+                                                class="text-blue-200 hover:text-blue-500 hover:underline border-2 border-blue-200 rounded-2xl px-3"
                                             >
                                                 {category.name}
                                             </button>
@@ -167,8 +167,9 @@
                             <div class="flex items-center space-x-4 mb-6">
                                 <label for="quantity" class="font-medium ">Quantity:</label>
                                 <div class="flex items-center border border-gray-300 rounded-lg">
+                                    <!-- svelte-ignore a11y_consider_explicit_label -->
                                     <button 
-                                        on:click={() => selectedQuantity > 1 && selectedQuantity--}
+                                        onclick={() => selectedQuantity > 1 && selectedQuantity--}
                                         class="w-10 h-10 flex items-center justify-center text-white hover:text-gray-800 disabled:opacity-50"
                                         disabled={selectedQuantity <= 1}
                                     >
@@ -184,8 +185,9 @@
                                         bind:value={selectedQuantity}
                                         class="w-16 h-10 text-center border-x border-gray-300 focus:outline-none"
                                     />
+                                    <!-- svelte-ignore a11y_consider_explicit_label -->
                                     <button 
-                                        on:click={() => selectedQuantity++}
+                                        onclick={() => selectedQuantity++}
                                         class="w-10 h-10 flex items-center justify-center text-white hover:text-gray-800"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -196,7 +198,7 @@
                             </div>
                             
                             <button 
-                                on:click={handleAddToCart}
+                                onclick={handleAddToCart}
                                 disabled={!product.is_in_stock}
                                 class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center"
                             >
@@ -223,7 +225,7 @@
                                             ? 'border-white text-white' 
                                             : 'border-transparent text-gray-500 hover:text-blue-700 hover:border-gray-300'
                                     }`}
-                                    on:click={() => activeTab = 'description'}
+                                    onclick={() => activeTab = 'description'}
                                 >
                                     Description
                                 </button>
@@ -234,7 +236,7 @@
                                                 ? 'border-white text-white' 
                                                 : 'border-transparent text-gray-500 hover:text-blue-700 hover:border-gray-300'
                                         }`}
-                                        on:click={() => activeTab = 'tags'}
+                                        onclick={() => activeTab = 'tags'}
                                     >
                                         Tags
                                     </button>
@@ -246,7 +248,7 @@
                                                 ? 'border-white text-white' 
                                                 : 'border-transparent text-gray-500 hover:text-blue-700 hover:border-gray-300'
                                         }`}
-                                        on:click={() => activeTab = 'specifications'}
+                                        onclick={() => activeTab = 'specifications'}
                                     >
                                         Specifications
                                     </button>
@@ -255,7 +257,7 @@
                         </div>
                         
                         <!-- Tab Content -->
-                        <div class="p-6">
+                        <div class="p-2">
                             {#if activeTab === 'description'}
                                 <div class="prose text-white max-w-none">
                                     {@html product.description}
@@ -292,7 +294,7 @@
             <div class="bg-gray-900 text-center py-16">
                 <h2 class="text-2xl font-semibold mb-4">Product not found</h2>
                 <button 
-                    on:click={() => router.navigate('/products')}
+                    onclick={() => router.navigate('/products')}
                     class="inline-block bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700"
                 >
                     Continue Shopping
@@ -304,6 +306,7 @@
 
 <style>
     .prose {
+        font-size: 0.8rem;
         line-height: 1.6;
     }
     

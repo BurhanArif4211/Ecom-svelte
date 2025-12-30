@@ -73,18 +73,19 @@
           }`}
           aria-hidden={index === currentSlide ? "false" : "true"}
         >
-          <!-- Responsive image using <picture> (keeps DOM simpler than multiple img elements) -->
+          
           <picture class="w-full h-full block">
-            <!-- if your slide objects provide different sizes you can use them; fall back to slide.image.id -->
+           
             <source srcset={slide.image.desktop ?? slide.image.id} media="(min-width: 768px)" />
             <img
               src={slide.image.mobile ?? slide.image.id}
               alt={slide.title}
-              class="w-full h-full object-cover block"
+              class="w-full  object-fill lg:object-fit  aspect-video block "
               draggable="false"
             />
           </picture>
   
+          {#if slide.subtext || slide.link}
           <!-- Overlay (gradient + content) -->
           <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent flex items-center">
             <div class="container mx-auto px-4">
@@ -110,15 +111,16 @@
               </div>
             </div>
           </div>
+          {/if}
         </div>
       {/each}
     </div>
-  
+  {#if slides.length >1}
     <!-- Navigation Arrows (visible & accessible) -->
     <button
       on:click={prevSlide}
       aria-label="Previous slide"
-      class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 z-30 focus:outline-none focus:ring-2 focus:ring-white"
+      class="absolute left-4 top-1/2 -translate-y-1/2 text-white p-3 rounded-full transition-all duration-200 z-30 focus:outline-none focus:ring-2 focus:ring-white"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -128,13 +130,13 @@
     <button
       on:click={nextSlide}
       aria-label="Next slide"
-      class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 z-30 focus:outline-none focus:ring-2 focus:ring-white"
+      class="absolute right-4 top-1/2 -translate-y-1/2 text-white p-3 rounded-full transition-all duration-200 z-30 focus:outline-none focus:ring-2 focus:ring-white"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
       </svg>
     </button>
-  
+  {/if}
     <!-- Dots Indicator -->
     {#if slides.length > 1}
       <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-30">

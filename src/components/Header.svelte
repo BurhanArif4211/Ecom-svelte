@@ -1,14 +1,39 @@
 <script>
+    import { onMount,onDestroy } from "svelte";
     import { cart } from "../lib/stores";
     import { router } from "../router";
 
     import CartModal from "./CartModal.svelte";
     let showCartModal;
 
+  let lastScrollY = 0;
+  let visible = true;
+
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY;
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      visible = false;
+    } else {
+      visible = true;
+    }
+    lastScrollY = currentScrollY;
+  };
+
+  onMount(() => {
+    window.addEventListener("scroll", handleScroll);
+  });
+  onDestroy(() => {
+    window.removeEventListener("scroll", handleScroll);
+  });
+
 </script>
-<header class="sticky top-0 z-50 bg-gray-900 shadow-md">
+<header   class:translate-y-0={visible}
+  class:-translate-y-full={!visible} class="transition-transform sticky top-0 z-50 bg-gray-900 shadow-md">
     <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <div>
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_missing_attribute -->
             <img src="/logo_w.png" class="w-18 h-18 cursor-pointer" 
                 onclick={() => router.navigate('/home')}/>
         </div>
@@ -36,6 +61,7 @@
         </nav>
         <div class="flex items-center space-x-4">
             <!-- Search Button -->
+            <!-- svelte-ignore a11y_consider_explicit_label -->
             <button class="p-2" onclick={() => router.navigate('/products')}>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

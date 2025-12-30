@@ -43,7 +43,8 @@
     <main class="flex-grow">
         {#if loading}
             <div class="flex justify-center items-center h-64">
-                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                <!-- <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div> -->
+                <div class="animate-spin"><img src="/wheel.png" class="w-30 object-fill" alt="loading spinning wheel"></div>
             </div>
         {:else if error}
             <div class="container mx-auto px-4 py-8">

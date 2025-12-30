@@ -14,10 +14,17 @@
     const prevSlide = () => {
         currentSlide = (currentSlide - 1 + slides.length) % slides.length;
     };
+    
+    function handleCardClick(link) {
+        router.navigate(link);
+        window.location=link;
+    }
 </script>
 
 <div class="relative  rounded-2xl overflow-hidden border-2 shadow-2xl">
-    <div class="text-4xl font-black mb-8 text-gray-100">Products on Sale</div>
+    <div class=" lg:text-4xl text-2xl mb-1 text-center font-bold text-gray-100">Products on Sale</div>
+    <div class=" lg:text-4xl text-xs mb-4 text-center font-bold text-gray-100">Click to View</div>
+
     <div class="relative h-64 md:h-80 lg:h-96">
         {#each slides as slide, index}
             <div 
@@ -25,15 +32,15 @@
                     index === currentSlide ? 'opacity-100' : 'opacity-0'
                 }`}
             >
-                <div class="relative items-center h-full">
+                <div class="relative items-center">
                     <!-- Image -->
-                    
+    
                         <!-- svelte-ignore a11y_click_events_have_key_events -->
                         <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                        <img on:click={() =>router.navigate(slide.link)}
+                        <img on:click={() => handleCardClick(slide.link)}
                             src={slide.image.id}
                             alt="Sale Banner" 
-                            class="w-full h-full opacity-80 object-cover"
+                            class="w-full object-fit aspect-video"
                         />
                 </div>
             </div>
@@ -44,7 +51,7 @@
             <!-- svelte-ignore a11y_consider_explicit_label -->
             <button 
                 on:click={prevSlide}
-                class="absolute left-4 top-1/2 -translate-y-1/2 bg-[#ffffff62] bg-opacity-20 hover:bg-opacity-30 text-white p-2 rounded-full transition-all duration-300"
+                class="absolute left-4 top-1/2 -translate-y-1/2  bg-opacity-20 hover:bg-opacity-30 text-white p-2 rounded-full transition-all duration-300"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -54,7 +61,7 @@
             <!-- svelte-ignore a11y_consider_explicit_label -->
             <button 
                 on:click={nextSlide}
-                class="absolute right-4 top-1/2 -translate-y-1/2 bg-[#ffffff62] bg-opacity-20 hover:bg-opacity-30 text-white p-2 rounded-full transition-all duration-300"
+                class="absolute right-4 top-1/2 -translate-y-1/2  bg-opacity-20 hover:bg-opacity-30 text-white p-2 rounded-full transition-all duration-300"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

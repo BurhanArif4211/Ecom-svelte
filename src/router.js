@@ -116,12 +116,19 @@ export const routes = {
       }
     }
   },
-  
+    '/TOS': {
+    component: () => import('./pages/TOS.svelte'),
+    name: ''
+  },
+    '/Return-Policy': {
+    component: () => import('./pages/RefundPolicy.svelte'),
+    name: ''
+  },
   // Fallback route
   '/404': {
     component: () => import('./pages/NotFound.svelte'),
     name: 'NotFound'
-  }
+  },
 };
 
 // Path parser with support for dynamic parameters
@@ -283,7 +290,7 @@ function createRouter() {
   
   // Helper function for category navigation
   function navigateToCategory(slug) {
-    navigate(`/category/${slug}`);
+    navigate(`/products?category=${slug}`);
   }
   
   // Helper function for product navigation

@@ -22,7 +22,7 @@
     };
 </script>
 
-<div class="fixed right-6 bottom-6 z-50 flex flex-col items-end space-y-3">
+<div class="fixed right-4 bottom-4 z-50 flex flex-col items-end space-y-3">
     <!-- <button 
         on:click={() => isVisible = !isVisible}
         class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110"
@@ -42,7 +42,7 @@
         {#each Object.entries(socialLinks) as [platform, data]}
             <button
                 on:click={() => openChat(platform)}
-                class={`${data.color} text-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 group relative`}
+                class={`${data.color} text-white p-2 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 group relative`}
                 aria-label={data.label}
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
