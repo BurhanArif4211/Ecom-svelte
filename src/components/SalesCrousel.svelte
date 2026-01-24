@@ -23,9 +23,9 @@
 
 <div class="relative  rounded-2xl overflow-hidden border-2 shadow-2xl">
     <div class=" lg:text-4xl text-2xl mb-1 text-center font-bold text-gray-100">Products on Sale</div>
-    <div class=" lg:text-4xl text-xs mb-4 text-center font-bold text-gray-100">Click to View</div>
+    <div class=" lg:text-4xl text-xs mb-1 text-center font-bold text-gray-100">Click to View</div>
 
-    <div class="relative h-64 md:h-80 lg:h-96">
+    <div class="relative w-full aspect-video">
         {#each slides as slide, index}
             <div 
                 class={`absolute inset-0 transition-opacity duration-500 ease-in-out ${

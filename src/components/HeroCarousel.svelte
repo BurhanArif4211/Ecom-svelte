@@ -62,8 +62,7 @@
     on:mouseleave={startAutoplay}
     aria-roledescription="carousel"
   >
-    <!-- Main Carousel: note min-height so absolute slides have space -->
-    <div class="relative overflow-hidden min-h-[40vh] md:min-h-[70vh]">
+    <div class="relative overflow-hidden w-full aspect-video">
       {#each slides as slide, index}
         <div
           class={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
@@ -73,18 +72,12 @@
           }`}
           aria-hidden={index === currentSlide ? "false" : "true"}
         >
-          
-          <picture class="w-full h-full block">
-           
-            <source srcset={slide.image.desktop ?? slide.image.id} media="(min-width: 768px)" />
             <img
               src={slide.image.mobile ?? slide.image.id}
               alt={slide.title}
-              class="w-full  object-fill lg:object-fit  aspect-video block "
+              class="w-full object-fill lg:object-fit  aspect-video block "
               draggable="false"
             />
-          </picture>
-  
           {#if slide.subtext || slide.link}
           <!-- Overlay (gradient + content) -->
           <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent flex items-center">

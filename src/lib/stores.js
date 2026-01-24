@@ -7,7 +7,7 @@ const STORE_API_BASE = `/wp/wp-json/wc/store`;
 const PUBLIC_API_BASE = `/wp/wp-json/wc/store`;
 // Session store
 export let _nonce = writable("")
-
+export let SOCIALS_VISIBLE = writable(true);
 // Cart store
 export const cart = writable({
     items: [],
@@ -15,6 +15,7 @@ export const cart = writable({
     items_weight: 0,
     needs_payment: false,
     needs_shipping: false,
+    shipping_rates: [],
     totals: {
         total_items: "0",
         total_items_tax: "0",
@@ -43,13 +44,40 @@ export const fetchCart = async () => {
     try {
         cart.update(c => ({ ...c, isLoading: true }));
         const response = await fetch(`${STORE_API_BASE}/cart`, {
-            
             credentials: 'include'
         });
         _nonce.set(response.headers.get("nonce"));
         if (!response.ok) throw new Error('Failed to fetch cart');
         
         const data = await response.json();
+        
+        // Auto-select free shipping if available and no shipping is selected
+        if (data.shipping_rates && data.shipping_rates.length > 0) {
+            const firstPackage = data.shipping_rates[0];
+            const hasSelectedShipping = firstPackage.shipping_rates.some(rate => rate.selected);
+            
+            if (!hasSelectedShipping) {
+                // Find free shipping rate
+                const freeShippingRate = firstPackage.shipping_rates.find(
+                    rate => parseFloat(rate.price) === 0
+                );
+                
+                // If free shipping exists, select it
+                if (freeShippingRate) {
+                    await selectShippingRate(freeShippingRate.rate_id);
+                    // Fetch cart again to get updated data
+                    const updatedResponse = await fetch(`${STORE_API_BASE}/cart`, {
+                        credentials: 'include'
+                    });
+                    if (updatedResponse.ok) {
+                        const updatedData = await updatedResponse.json();
+                        data.totals = updatedData.totals;
+                        data.shipping_rates = updatedData.shipping_rates;
+                    }
+                }
+            }
+        }
+        
         cart.set({
             ...data,
             isLoading: false
@@ -59,7 +87,6 @@ export const fetchCart = async () => {
         cart.update(c => ({ ...c, isLoading: false }));
     }
 };
-
 // Add to cart
 export const addToCart = async (product_id, quantity = 1) => {
     try {
@@ -157,7 +184,7 @@ export const removeCartItem = async (key) => {
 
 
 // Select shipping rate
-export const selectShippingRate = async (rateId) => {
+export const selectShippingRate = async (rateId, packageId = 0) => {
     try {
         const response = await fetch(`${STORE_API_BASE}/cart/select-shipping-rate`, {
             method: 'POST',
@@ -165,7 +192,7 @@ export const selectShippingRate = async (rateId) => {
                 'Content-Type': 'application/json',
                 'Nonce': get(_nonce)
             },
-            body: JSON.stringify({ package_id: 0, rate_id: rateId }),
+            body: JSON.stringify({ package_id: packageId, rate_id: rateId }),
             credentials: 'include'
         });
         
@@ -174,14 +201,14 @@ export const selectShippingRate = async (rateId) => {
             throw new Error(errorData.message || 'Failed to select shipping rate');
         }
         
+        // Refresh cart to get updated totals
+        await fetchCart();
         return await response.json();
     } catch (error) {
         console.error('Shipping rate error:', error);
         throw error;
     }
 };
-
-
 // Update customer information - corrected to match API spec
 export const updateCustomer = async (data) => {
     try {

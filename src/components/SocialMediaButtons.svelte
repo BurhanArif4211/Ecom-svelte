@@ -1,6 +1,7 @@
 <!-- src/components/SocialMediaButtons.svelte -->
 <script>
-    let isVisible = true;
+    import { writable } from 'svelte/store';
+    export let SocialIconsVisible = writable(true);
     
     const socialLinks = {
         whatsapp: {
@@ -36,7 +37,7 @@
     <!-- Social buttons -->
     <div 
         class={`flex flex-col space-y-3 transition-all duration-300 transform ${
-            isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+            SocialIconsVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         }`}
     >
         {#each Object.entries(socialLinks) as [platform, data]}

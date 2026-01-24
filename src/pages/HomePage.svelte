@@ -80,7 +80,7 @@
     />
     <meta
         name="keywords"
-        content="auto parts, car accessories, LED lights, Pakistan, automotive, car modifications"
+        content="auto parts, car accessories, LED lights, automotive, car modifications , bike modification, bike parts, s"
     />
     <link rel="canonical" href="https://autogearlift.com" />
 </svelte:head>
@@ -101,25 +101,25 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 {:else}
     <!-- Welcome -->
-    <div class="lg:hidden font-black text-white py-6 text-3xl text-center">
-        Welcome To<br /> Auto Gear Lift
+    <div class="lg:hidden font-black text-white pt-1 text-xl text-center">
+        Welcome To Auto Gear Lift
     </div>
     <!-- Hero Carousel -->
     {#if heroSlides.length > 0}
-        <section class="w-full mb-10">
+        <section class="w-full">
             <HeroCarousel slides={heroSlides} />
         </section>
     {/if}
 
     <!-- Sales Carousel -->
     {#if salesSlides.length > 0}
-        <section class="container mx-auto mb-10">
+        <section class="container mx-auto">
             <SalesCarousel slides={salesSlides} />
         </section>
     {/if}
 
     <!-- Featured Products -->
-    <section class="container mx-auto px-4 mb-10">
+    <section class="container mx-auto px-4">
         <div class="text-2xl text-center font-bold text-white mb-4">
             Featured Products
         </div>
